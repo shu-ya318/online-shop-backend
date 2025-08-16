@@ -1,0 +1,163 @@
+package com.project.demo.model;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+import com.project.demo.enumeration.AccountStatus;
+import com.project.demo.enumeration.AuthProvider;
+import com.project.demo.enumeration.Role;
+
+import jakarta.persistence.*;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Entity
+@Table(name = "users")
+@Getter
+@Setter
+@ToString(exclude = "password") // 密碼不列入 toString
+public class User {
+
+    // ===== 主鍵 =====
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    private Long id;
+
+    // ===== 基本資訊 =====
+    @Column(name = "uuid",nullable = false, unique = true, updatable = false)
+	private String uuid;
+
+    @Column(name = "email", nullable = false, unique = true, length = 255)
+    private String email;
+
+    // 密碼 (雜湊加密)
+    @Column(name = "password", nullable = false, length = 255)
+    private String password;
+
+    // 聯絡電話
+    @Column(name = "phone_number", nullable = false, length = 20)
+    private String phoneNumber;
+
+    // 帳號狀態
+    @Enumerated(EnumType.STRING)
+    @Column(name = "account_status", nullable = false, length = 20)
+    private AccountStatus accountStatus = AccountStatus.REGISTERED;
+
+    // ===== 角色權限 =====
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    private Set<Role> userRoles = new HashSet<>(Set.of(Role.CUSTOMER));
+
+    // ===== 授權相關 =====
+    @Enumerated(EnumType.STRING)
+    @Column(name = "auth_provider", length = 20)
+    private AuthProvider authProvider = AuthProvider.LOCAL;
+
+    // ===== 審計欄位 =====
+    // 帳號創建時間
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    // 創建者
+    @Column(name = "created_by", updatable = false, length = 50)
+    private String createdBy = "system";
+
+    // 最近一次資料更新時間
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
+    // 最近更新者
+    @Column(name = "updated_by", length = 50)
+    private String updatedBy = "system";
+
+    // ===== 登入資訊 =====
+    // 最近一次登入時間
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt;
+
+    // 最近一次登入 IP
+    @Column(name = "last_login_ip", length = 45)
+    private String lastLoginIp;
+
+    // ===== 密碼相關 =====
+    // 啟用雙重驗證
+    @Column(name = "two_factor_enabled", nullable = false)
+    private boolean twoFactorEnabled = false;
+    
+    // 最近一次密碼修改時間
+    @Column(name = "password_changed_at")
+    private LocalDateTime passwordChangedAt;
+    
+    // ===== 個人資料 =====
+    // 頭像連結
+    @Column(name = "avatar_url", length = 255)
+    private String avatarUrl;
+
+    // 生日
+    @Column(name = "birth")
+    private LocalDate birth;
+    
+    // 名
+    @Column(name = "first_name", length = 50)
+    private String firstName;
+
+    // 姓
+    @Column(name = "last_name", length = 50)
+    private String lastName;
+
+    // 國籍
+    @Column(name = "nationality", length = 50)
+    private String nationality;
+
+    // 城市
+    @Column(name = "city", length = 100)
+    private String city;
+
+    // 地址
+    @Column(name = "address", length = 255)
+    private String address;
+
+    // 郵遞區號
+    //@Column(name = "post_index", length = 20)
+    //private String postIndex;
+
+    // 語言偏好
+    //Column(name = "locale", length = 10)
+    //private String locale;
+
+    // 時區
+    //@Column(name = "time_zone", length = 50)
+    //private String timeZone;
+
+    // 備註
+    //@Column(name = "remark", length = 500)
+    //private String remark;
+
+    // ===== 軟刪除 =====
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    // ===== equals 與 hashCode 只比對主鍵 =====
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true; // 同一物件一定相等
+        if (o == null || getClass() != o.getClass()) return false; // 不同類型或 null 不相等
+        User user = (User) o;
+        return Objects.equals(id, user.id); // 比較 id 是否相等
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id); // 用 id 產生 hashCode
+    }
+}

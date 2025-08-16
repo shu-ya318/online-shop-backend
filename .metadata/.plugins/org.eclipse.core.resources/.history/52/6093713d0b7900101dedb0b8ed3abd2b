@@ -1,0 +1,15 @@
+package com.project.demo.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+@Configuration
+public class ApplicationConfig {
+    @Bean
+    PasswordEncoder getPasswordEncoder() {
+    	// 加密強度: 12 (建議最少值: 10)
+        return new BCryptPasswordEncoder(12);
+    }
+}

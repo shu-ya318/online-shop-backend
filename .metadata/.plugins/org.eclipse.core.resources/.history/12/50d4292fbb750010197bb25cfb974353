@@ -1,0 +1,29 @@
+package com.project.demo.mapper;
+
+import com.project.demo.dto.user.*;
+import com.project.demo.model.User;
+
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.ReportingPolicy;
+
+/**
+ * 使用 MapStruct 自動生成實作，componentModel = "spring" 可被 Spring 管理。
+ * unmappedTargetPolicy = IGNORE 可忽略未映射欄位的警告。
+ */
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface UserMapper {
+
+	default User toUser(UserRegisterRequestDTO dto) {
+	    User user = new User(); // 建立 User 並帶入 Model 預設值
+	    updateUserFromUserRegisterRequestDTO(dto, user); // 只覆蓋非 null 欄位
+	    return user;
+	}
+
+	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+	void updateUserFromUserRegisterRequestDTO(UserRegisterRequestDTO dto, @MappingTarget User user);
+
+    void updateUserFromUserUpdateRequestDTO(UserUpdateRequestDTO dto, @MappingTarget User user); 
+}

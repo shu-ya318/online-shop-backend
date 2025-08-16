@@ -1,0 +1,15 @@
+package com.project.demo.dto.user;
+
+//import lombok.Getter;
+//import lombok.Setter;
+//
+//@Getter
+//@Setter
+public record UserRegisterRequestDTO(
+		@NotBlank(message = "Email is required") @Email(message = "Invalid email format") String email,
+	String password, // 未加密
+	String phoneNumber,
+	String firstName,
+	String lastName,
+	String birth) {
+}

@@ -1,0 +1,42 @@
+package com.project.demo.controller;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.project.demo.dto.user.UserRegisterRequestDTO;
+import com.project.demo.service.UserService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+import static com.project.demo.data.PathConstantData.API_VUE;
+import static com.project.demo.data.PathConstantData.API_PUBLIC;
+import static com.project.demo.data.PathConstantData.API_REGISTER;
+import static com.project.demo.data.PathConstantData.API_ACTIVATE;
+
+@RestController
+@RequiredArgsConstructor
+@CrossOrigin(origins = API_VUE)
+@RequestMapping(API_PUBLIC)
+public class UserController {
+
+	private final UserService userService;
+	
+	// 註冊帳號
+    @PostMapping(API_REGISTER)
+    public ResponseEntity<?> register(@Valid @RequestBody UserRegisterRequestDTO dto) {
+        userService.register(dto);
+        return ResponseEntity.ok("Registration successful, please check your email for activation.");
+    }
+    
+    // 驗證帳號
+//    @GetMapping(API_ACTIVATE)
+//    public ResponseEntity<?> activate(@Valid @RequestParam String email, @RequestParam String code) {
+//        userService.activate(email, code);
+//        return ResponseEntity.ok("Account activated successfully.");
+//    }
+    
+    // 登入帳號
+    
+}
+

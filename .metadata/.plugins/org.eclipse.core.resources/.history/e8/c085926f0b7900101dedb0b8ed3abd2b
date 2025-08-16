@@ -1,0 +1,62 @@
+package com.project.demo.config;
+
+import java.util.List;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import static com.project.demo.data.PathConstantData.API_PUBLIC_ALL;
+import static com.project.demo.data.PathConstantData.API_VUE;
+import static com.project.demo.data.PathConstantData.API_DNS;
+
+@Configuration
+public class SecurityConfig {
+
+    /**
+     * Spring Security 的主要設定，定義 HttpSecurity 行為。
+     */
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            // 關閉 CSRF 保護，通常 REST API 使用 Token 時會關閉
+            .csrf(csrf -> csrf.disable())
+            
+            // 啟用 CORS 支援，但此處不直接設定，使用 corsConfigurationSource() Bean 提供設定
+            .cors(cors -> {})
+            
+            // 設定授權規則
+            .authorizeHttpRequests(auth -> auth
+                // 允許指定路徑的資源不需驗證
+                .requestMatchers(API_PUBLIC_ALL).permitAll()
+                // 其他所有請求都需身份驗證
+                .anyRequest().authenticated()
+            );
+        return http.build();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        
+        config.setAllowedOrigins(List.of(
+            API_VUE,
+            API_DNS
+        ));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        
+        source.registerCorsConfiguration("/**", config);
+        
+        return source;
+    }
+}
+

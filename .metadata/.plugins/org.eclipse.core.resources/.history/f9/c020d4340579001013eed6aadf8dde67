@@ -1,0 +1,23 @@
+package com.project.demo.repository;
+
+import org.springframework.stereotype.Repository;
+
+import com.project.demo.model.User;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+
+	// ===== 前台 =====
+	// 根據 email 判斷使用者是否已存在
+	boolean existsByEmail(String email);
+	
+	// 根據 email 查找使用者 (註冊、登入時使用)
+	Optional<User> findByEmail(String email);
+
+    // ===== 後台 =====
+
+}

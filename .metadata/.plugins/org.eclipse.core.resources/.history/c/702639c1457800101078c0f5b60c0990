@@ -1,0 +1,79 @@
+package com.project.demo.service;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final RedisCacheService redisCacheService;
+    private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
+    private final UserMapper userMapper;
+
+    public void register(UserRegisterRequestDTO dto) {
+        // 檢查 email 是否已註冊且未被刪除
+        Optional<User> optionalUser = userRepository.findByEmail(dto.getEmail());
+        
+        User user;
+        if (optionalUser.isPresent()) {
+            if (!optionalUser.get().isDeleted()) {
+                throw new IllegalArgumentException("Email already registered");
+            }
+            // 軟刪除帳號再註冊：覆寫舊資料
+            user = optionalUser.get();
+            userMapper.updateUserFromUserRegisterRequestDTO(dto, user);
+        } else {
+            // 新使用者
+            user = userMapper.toUser(dto);
+        }
+        
+        user.setUuid(UUID.randomUUID().toString());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        userRepository.save(user);
+
+        // 產生驗證碼
+//        String activationCode = generateActivationCode();
+
+        // 將驗證碼存入 Redis
+//        redisCacheService.saveActivationCode(user.getEmail(), activationCode);
+
+        // 寄驗證信
+        // mailService.sendActivationEmail(user.getEmail(), activationCode);
+    }
+    
+//    public void activate(String email, String code) {
+//        String redisCode = redisCacheService.getActivationCode(email);
+//
+//        
+//        if (redisCode == null) {
+//            throw new RuntimeException("Activation code expired or not found.");
+//        }
+//
+//        if (!redisCode.equals(code)) {
+//            throw new RuntimeException("Invalid activation code.");
+//        }
+//
+//        User user = userRepository.findByEmail(email)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+//
+//        if (user.isDeleted()) {
+//            throw new RuntimeException("User account is deleted.");
+//        }
+//
+//        if (user.getAccountStatus() == AccountStatus.ACTIVE) {
+//            throw new RuntimeException("Account is already activated.");
+//        }
+//
+//        user.setAccountStatus(AccountStatus.ACTIVE);
+//        userRepository.save(user);
+//
+//        // 啟用成功，刪除 Redis 驗證碼
+//        redisCacheService.deleteActivationCode(email);
+//    }
+//    
+//    // 產生六位數字驗證碼
+//    private String generateActivationCode() {
+//        int code = (int)(Math.random() * 900000) + 100000;
+//        return String.valueOf(code);
+//    }
+}

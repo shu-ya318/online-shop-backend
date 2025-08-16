@@ -7,7 +7,7 @@ public enum Role {
     SELLER,      // 賣家，認證用戶，可管理商品、訂單、庫存
     
     // ===== 後台 =====
-    USER,        // 一般使用者
+    USER,        // 一般使用者,賣家
     ADMIN,       // 系統管理員
-    SUPER_ADMIN, // 超級管理員
+    SUPER_ADMIN, // 超級管理員 // 如: 可見軟刪除的帳戶
 }

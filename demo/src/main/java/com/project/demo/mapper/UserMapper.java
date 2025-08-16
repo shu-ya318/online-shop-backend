@@ -1,0 +1,25 @@
+package com.project.demo.mapper;
+
+import com.project.demo.dto.user.*;
+import com.project.demo.model.User;
+
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.ReportingPolicy;
+
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface UserMapper {
+
+	// default User toUser(UserRegisterRequestDTO dto) {
+	//     User user = new User(); // 建立 User ，並帶入 Model 預設值
+	//     updateUserFromUserRegisterRequestDTO(dto, user); // 只覆蓋非 null 欄位
+
+	//     return user;
+	// }
+	User toUser(UserRegisterRequestDTO dto);
+
+	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+	void updateUserFromUserRegisterRequestDTO(UserRegisterRequestDTO dto, @MappingTarget User user);
+}

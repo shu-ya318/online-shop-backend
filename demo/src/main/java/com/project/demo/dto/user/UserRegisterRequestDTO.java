@@ -1,0 +1,34 @@
+package com.project.demo.dto.user;
+
+import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+public record UserRegisterRequestDTO(
+	@NotBlank(message = "Email is required") 
+	@Email(message = "Invalid email format") 
+	String email,
+
+	@NotBlank(message = "Password is required") 
+	@Size(min = 8, max = 20,  message = "Password must be 8-20 characters long") 
+	String password, // 未加密
+
+	@NotBlank(message = "Phone number is required") 
+	@Size(min = 10, max = 10, message = "Phone number must be 10 digits")
+	String phoneNumber,
+
+	@NotBlank(message = "Name is required") 
+	String name,
+
+	@NotNull(message = "Birth is required") 
+	@JsonFormat(pattern = "yyyy-MM-dd") 
+	LocalDate birth,
+
+	@NotNull(message = "Address is required")
+	String address){
+}
