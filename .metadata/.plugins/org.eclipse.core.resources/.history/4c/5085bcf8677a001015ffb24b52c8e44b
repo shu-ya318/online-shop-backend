@@ -1,0 +1,59 @@
+package com.project.demo.mapper;
+
+import com.project.demo.dto.user.UserRegisterRequestDTO;
+import com.project.demo.model.User;
+import javax.annotation.processing.Generated;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = "org.mapstruct.ap.MappingProcessor",
+    date = "2025-08-16T14:12:03+0800",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.50.v20250729-0351, environment: Java 21.0.8 (Eclipse Adoptium)"
+)
+@Component
+public class UserMapperImpl implements UserMapper {
+
+    @Override
+    public User toUser(UserRegisterRequestDTO dto) {
+        if ( dto == null ) {
+            return null;
+        }
+
+        User user = new User();
+
+        user.setAddress( dto.address() );
+        user.setBirth( dto.birth() );
+        user.setEmail( dto.email() );
+        user.setName( dto.name() );
+        user.setPassword( dto.password() );
+        user.setPhoneNumber( dto.phoneNumber() );
+
+        return user;
+    }
+
+    @Override
+    public void updateUserFromUserRegisterRequestDTO(UserRegisterRequestDTO dto, User user) {
+        if ( dto == null ) {
+            return;
+        }
+
+        if ( dto.address() != null ) {
+            user.setAddress( dto.address() );
+        }
+        if ( dto.birth() != null ) {
+            user.setBirth( dto.birth() );
+        }
+        if ( dto.email() != null ) {
+            user.setEmail( dto.email() );
+        }
+        if ( dto.name() != null ) {
+            user.setName( dto.name() );
+        }
+        if ( dto.password() != null ) {
+            user.setPassword( dto.password() );
+        }
+        if ( dto.phoneNumber() != null ) {
+            user.setPhoneNumber( dto.phoneNumber() );
+        }
+    }
+}

@@ -14,6 +14,5 @@ public class PathConstantData {
 	
 	/* USER */
 	public static final String API_REGISTER = "/user/register";
-	public static final String API_ACTIVATE = "/user/activate";
-	public static final String API_ACTIVATE_LINK = "/user/activate?email=%s&code=%s";
+	public static final String API_LOGIN = "/user/login";
 }
