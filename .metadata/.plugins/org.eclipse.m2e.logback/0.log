@@ -1332,3 +1332,76 @@
 2025-08-16 20:39:03,990 [Worker-4: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
 2025-08-16 20:54:38,961 [Worker-7: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
 2025-08-16 21:09:11,731 [Worker-2: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2025-08-16 21:35:21,052 [Worker-7: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2025-08-16 21:35:43,826 [Worker-5: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 1 resource from src\main\resources to target\classes
+2025-08-16 21:35:43,844 [Worker-5: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 0 resource from src\main\resources to target\classes
+2025-08-16 21:35:44,168 [Worker-5: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Starting Hibernate enhancement for classes on C:\Spring\Workspace\online-shop-backend\demo\target\classes
+2025-08-16 21:35:44,495 [Worker-5: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - skip non existing resourceDirectory C:\Spring\Workspace\online-shop-backend\demo\src\test\resources
+2025-08-17 09:11:39,529 [Worker-4: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is out-of-date. Trying to update.
+2025-08-17 10:04:42,974 [Worker-0: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 1 resource from src\main\resources to target\classes
+2025-08-17 10:04:42,990 [Worker-0: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 0 resource from src\main\resources to target\classes
+2025-08-17 10:04:43,367 [Worker-0: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Starting Hibernate enhancement for classes on C:\Spring\Workspace\online-shop-backend\demo\target\classes
+2025-08-17 10:04:43,688 [Worker-0: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - skip non existing resourceDirectory C:\Spring\Workspace\online-shop-backend\demo\src\test\resources
+2025-08-17 10:05:00,928 [Worker-6: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 1 resource from src\main\resources to target\classes
+2025-08-17 10:05:00,936 [Worker-6: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 0 resource from src\main\resources to target\classes
+2025-08-17 10:05:00,943 [Worker-6: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Starting Hibernate enhancement for classes on C:\Spring\Workspace\online-shop-backend\demo\target\classes
+2025-08-17 10:05:00,979 [Worker-6: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - skip non existing resourceDirectory C:\Spring\Workspace\online-shop-backend\demo\src\test\resources
+2025-08-17 10:05:18,098 [Worker-6: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 1 resource from src\main\resources to target\classes
+2025-08-17 10:05:18,104 [Worker-6: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 0 resource from src\main\resources to target\classes
+2025-08-17 10:05:18,107 [Worker-6: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Starting Hibernate enhancement for classes on C:\Spring\Workspace\online-shop-backend\demo\target\classes
+2025-08-17 10:05:18,139 [Worker-6: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - skip non existing resourceDirectory C:\Spring\Workspace\online-shop-backend\demo\src\test\resources
+2025-08-17 10:05:34,470 [Worker-0: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 1 resource from src\main\resources to target\classes
+2025-08-17 10:05:34,487 [Worker-0: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 0 resource from src\main\resources to target\classes
+2025-08-17 10:05:34,496 [Worker-0: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Starting Hibernate enhancement for classes on C:\Spring\Workspace\online-shop-backend\demo\target\classes
+2025-08-17 10:05:34,544 [Worker-0: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - skip non existing resourceDirectory C:\Spring\Workspace\online-shop-backend\demo\src\test\resources
+2025-08-17 10:10:31,924 [Worker-21: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 1 resource from src\main\resources to target\classes
+2025-08-17 10:10:31,929 [Worker-21: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 0 resource from src\main\resources to target\classes
+2025-08-17 10:10:31,932 [Worker-21: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Starting Hibernate enhancement for classes on C:\Spring\Workspace\online-shop-backend\demo\target\classes
+2025-08-17 10:10:31,958 [Worker-21: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - skip non existing resourceDirectory C:\Spring\Workspace\online-shop-backend\demo\src\test\resources
+2025-08-17 10:11:21,959 [Worker-18: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 1 resource from src\main\resources to target\classes
+2025-08-17 10:11:21,973 [Worker-18: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 0 resource from src\main\resources to target\classes
+2025-08-17 10:11:21,982 [Worker-18: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Starting Hibernate enhancement for classes on C:\Spring\Workspace\online-shop-backend\demo\target\classes
+2025-08-17 10:11:22,030 [Worker-18: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - skip non existing resourceDirectory C:\Spring\Workspace\online-shop-backend\demo\src\test\resources
+2025-08-17 10:18:36,685 [Worker-27: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 1 resource from src\main\resources to target\classes
+2025-08-17 10:18:36,690 [Worker-27: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 0 resource from src\main\resources to target\classes
+2025-08-17 10:18:36,694 [Worker-27: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Starting Hibernate enhancement for classes on C:\Spring\Workspace\online-shop-backend\demo\target\classes
+2025-08-17 10:18:36,716 [Worker-27: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - skip non existing resourceDirectory C:\Spring\Workspace\online-shop-backend\demo\src\test\resources
+2025-08-17 10:50:08,693 [Worker-7: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2025-08-17 10:50:17,826 [Worker-10: Building] INFO  o.e.m.c.i.l.LifecycleMappingFactory - Using org.eclipse.m2e.jdt.JarLifecycleMapping lifecycle mapping for MavenProject: com.example:project:0.0.1-SNAPSHOT @ C:\Spring\Workspace\online-shop-backend\demo\pom.xml.
+2025-08-17 10:50:18,465 [Worker-10: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 1 resource from src\main\resources to target\classes
+2025-08-17 10:50:18,473 [Worker-10: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 0 resource from src\main\resources to target\classes
+2025-08-17 10:50:18,540 [Worker-10: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Starting Hibernate enhancement for classes on C:\Spring\Workspace\online-shop-backend\demo\target\classes
+2025-08-17 10:50:18,758 [Worker-10: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - skip non existing resourceDirectory C:\Spring\Workspace\online-shop-backend\demo\src\test\resources
+2025-08-17 10:50:42,049 [Worker-17: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 1 resource from src\main\resources to target\classes
+2025-08-17 10:50:42,060 [Worker-17: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 0 resource from src\main\resources to target\classes
+2025-08-17 10:50:42,069 [Worker-17: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Starting Hibernate enhancement for classes on C:\Spring\Workspace\online-shop-backend\demo\target\classes
+2025-08-17 10:50:42,127 [Worker-17: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - skip non existing resourceDirectory C:\Spring\Workspace\online-shop-backend\demo\src\test\resources
+2025-08-17 10:51:15,037 [Worker-7: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 1 resource from src\main\resources to target\classes
+2025-08-17 10:51:15,043 [Worker-7: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 0 resource from src\main\resources to target\classes
+2025-08-17 10:51:15,046 [Worker-7: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Starting Hibernate enhancement for classes on C:\Spring\Workspace\online-shop-backend\demo\target\classes
+2025-08-17 10:51:15,086 [Worker-7: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - skip non existing resourceDirectory C:\Spring\Workspace\online-shop-backend\demo\src\test\resources
+2025-08-17 10:51:16,670 [Worker-12: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 1 resource from src\main\resources to target\classes
+2025-08-17 10:51:16,674 [Worker-12: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 0 resource from src\main\resources to target\classes
+2025-08-17 10:51:16,678 [Worker-12: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Starting Hibernate enhancement for classes on C:\Spring\Workspace\online-shop-backend\demo\target\classes
+2025-08-17 10:51:16,706 [Worker-12: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - skip non existing resourceDirectory C:\Spring\Workspace\online-shop-backend\demo\src\test\resources
+2025-08-17 10:51:24,276 [Worker-11: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 1 resource from src\main\resources to target\classes
+2025-08-17 10:51:24,279 [Worker-11: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 0 resource from src\main\resources to target\classes
+2025-08-17 10:51:24,283 [Worker-11: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Starting Hibernate enhancement for classes on C:\Spring\Workspace\online-shop-backend\demo\target\classes
+2025-08-17 10:51:24,308 [Worker-11: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - skip non existing resourceDirectory C:\Spring\Workspace\online-shop-backend\demo\src\test\resources
+2025-08-17 12:39:50,113 [Worker-4: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2025-08-17 12:39:54,350 [Worker-4: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 1 resource from src\main\resources to target\classes
+2025-08-17 12:39:54,371 [Worker-4: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 0 resource from src\main\resources to target\classes
+2025-08-17 12:39:54,767 [Worker-4: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Starting Hibernate enhancement for classes on C:\Spring\Workspace\online-shop-backend\demo\target\classes
+2025-08-17 12:39:55,196 [Worker-4: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - skip non existing resourceDirectory C:\Spring\Workspace\online-shop-backend\demo\src\test\resources
+2025-08-17 13:35:24,936 [Worker-4: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2025-08-17 13:35:28,588 [Worker-17: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 1 resource from src\main\resources to target\classes
+2025-08-17 13:35:28,609 [Worker-17: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 0 resource from src\main\resources to target\classes
+2025-08-17 13:35:28,944 [Worker-17: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Starting Hibernate enhancement for classes on C:\Spring\Workspace\online-shop-backend\demo\target\classes
+2025-08-17 13:35:29,220 [Worker-17: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - skip non existing resourceDirectory C:\Spring\Workspace\online-shop-backend\demo\src\test\resources
+2025-08-17 13:36:45,099 [Worker-4: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2025-08-17 13:36:48,732 [Worker-13: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 1 resource from src\main\resources to target\classes
+2025-08-17 13:36:48,748 [Worker-13: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - Copying 0 resource from src\main\resources to target\classes
+2025-08-17 13:36:49,085 [Worker-13: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Starting Hibernate enhancement for classes on C:\Spring\Workspace\online-shop-backend\demo\target\classes
+2025-08-17 13:36:49,380 [Worker-13: Building] INFO  o.a.m.s.f.DefaultMavenResourcesFiltering - skip non existing resourceDirectory C:\Spring\Workspace\online-shop-backend\demo\src\test\resources
+2025-08-17 22:44:13,333 [Worker-8: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2025-08-18 19:11:18,276 [Worker-6: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is out-of-date. Trying to update.

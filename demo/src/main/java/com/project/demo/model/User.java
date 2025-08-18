@@ -2,9 +2,15 @@ package com.project.demo.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.project.demo.enumeration.AccountStatus;
 import com.project.demo.enumeration.AuthProvider;
@@ -21,7 +27,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString(exclude = "password")
-public class User {
+public class User implements UserDetails {
 
     // ===== 主鍵 =====
     @Id
@@ -119,4 +125,36 @@ public class User {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return this.userRoles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.name()))
+                .collect(Collectors.toSet());
+	}
+
+	@Override
+	public String getUsername() {
+		return this.email;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return this.accountStatus != AccountStatus.LOCKED;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return this.accountStatus == AccountStatus.ACTIVE;
+	}
 }

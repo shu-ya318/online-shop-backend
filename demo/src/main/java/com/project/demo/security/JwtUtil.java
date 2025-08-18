@@ -52,15 +52,11 @@ public class JwtUtil {
 					.setExpiration(expiryDate)
 					.signWith(key, SignatureAlgorithm.HS256)
 					.compact();
-			
+
 			return token;
 		} catch (Exception e) {
 			throw e;
 		}
-	}
-
-	public String getEmailFromToken(String token) {
-		return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getSubject();
 	}
 
 	public boolean validateToken(String token) {
@@ -70,5 +66,9 @@ public class JwtUtil {
 		} catch (JwtException | IllegalArgumentException e) {
 			return false;
 		}
+	}
+
+	public String getEmailFromToken(String token) {
+		return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getSubject();
 	}
 }

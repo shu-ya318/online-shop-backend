@@ -1,0 +1,8 @@
+package com.project.demo.security;
+
+@Component
+@RequiredArgsConstructor
+public class JwtFilter extends OncePerRequestFilter {
+	
+
+}

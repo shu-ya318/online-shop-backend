@@ -15,4 +15,5 @@ public class PathConstantData {
 	/* USER */
 	public static final String API_REGISTER = "/user/register";
 	public static final String API_LOGIN = "/user/login";
+	public static final String API_123 = "/user/123";
 }

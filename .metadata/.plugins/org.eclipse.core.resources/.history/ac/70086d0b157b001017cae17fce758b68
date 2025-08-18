@@ -1,0 +1,8 @@
+package com.project.demo.security;
+
+@Component
+@RequiredArgsConstructor // 使用 Lombok 自動生成建構子注入
+public class JwtFilter extends OncePerRequestFilter {
+	
+
+}
