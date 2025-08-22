@@ -1,6 +1,7 @@
 package com.project.demo.service;
 
 import com.project.demo.dto.user.UserRegisterRequestDTO;
+import com.project.demo.dto.user.UserResponseDTO;
 import com.project.demo.mapper.UserMapper;
 import com.project.demo.model.User;
 import com.project.demo.repository.UserRepository;
@@ -8,6 +9,7 @@ import com.project.demo.repository.UserRepository;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -48,7 +50,12 @@ public class UserService {
         userRepository.save(user);
     }
 
-    @Transactional
+    public UserResponseDTO getUserResponseDTOByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        return userMapper.toResponseDto(user);
+    }
+
     public Optional<User> getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }

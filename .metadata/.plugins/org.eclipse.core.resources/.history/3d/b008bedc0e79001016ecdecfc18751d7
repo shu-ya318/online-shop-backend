@@ -1,5 +1,0 @@
-package com.project.demo.security.oauth2;
-
-public class GoogleOAuth2UserInfo {
-
-}

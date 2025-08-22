@@ -3,17 +3,20 @@ package com.project.demo.data;
 public class PathConstantData {
     /* LOCAL & PORT */
 	public static final String API_VUE = "http://localhost:5173";
-	public static final String API_SPRING = "http://localhost:8080";
+	public static final String API_SPRING = "http://localhost:8081";
 	
 	/* DNS */
 	public static final String API_DNS = "https://real-domain.com"; 
 	
-	/* PUBLIC */
-	public static final String API_PUBLIC = "/public";
+	// /* PUBLIC */
+//	 public static final String API_PUBLIC = "/public";
 	public static final String API_PUBLIC_ALL = "/public/**";
 	
 	/* USER */
-	public static final String API_REGISTER = "/user/register";
-	public static final String API_LOGIN = "/user/login";
-	public static final String API_123 = "/user/123";
+	public static final String API_REGISTER = "/public/user/register";
+	public static final String API_LOGIN = "/public/user/login";
+	public static final String API_LOGOUT = "/user/logout";
+	public static final String API_CURRENT_USER = "/user/me";
+	public static final String API_UPDATE_PROFILE = "/user/me/profile";
+	public static final String API_UPDATE_PASSWORD = "/user/me/password";
 }

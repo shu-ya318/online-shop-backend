@@ -1,0 +1,5 @@
+package com.project.demo.dto.user;
+
+public record UserResponseDTO(String uuid, String email, String name, String address, String phone) {
+
+}

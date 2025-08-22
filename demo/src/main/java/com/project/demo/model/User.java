@@ -28,6 +28,7 @@ import lombok.ToString;
 @Setter
 @ToString(exclude = "password")
 public class User implements UserDetails {
+	 private static final long serialVersionUID = 1L;
 
     // ===== 主鍵 =====
     @Id

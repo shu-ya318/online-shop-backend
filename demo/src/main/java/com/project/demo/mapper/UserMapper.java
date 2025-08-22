@@ -16,6 +16,8 @@ import org.mapstruct.ReportingPolicy;
 )
 public interface UserMapper {
 	User toUser(UserRegisterRequestDTO dto);
+	
+	UserResponseDTO toResponseDto(User user);
 
 	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 	void updateUserFromUserRegisterRequestDTO(UserRegisterRequestDTO dto, @MappingTarget User user);
