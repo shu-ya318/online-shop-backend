@@ -12,7 +12,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 
-
 import com.project.demo.security.JwtFilter;
 
 import lombok.RequiredArgsConstructor;
@@ -23,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import static com.project.demo.data.PathConstantData.API_PUBLIC_ALL;
 import static com.project.demo.data.PathConstantData.API_VUE;
 import static com.project.demo.data.PathConstantData.API_DNS;
+import static com.project.demo.data.PathConstantData.API_LOGOUT;
 
 @Configuration
 @RequiredArgsConstructor
@@ -39,14 +39,17 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-        	.cors(cors -> {})
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(API_PUBLIC_ALL).permitAll()
-                .anyRequest().authenticated()
-            );
+                .cors(cors -> {
+                })
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .logout(logout -> logout.logoutUrl(API_LOGOUT)
+                        .logoutSuccessHandler((request, response, authentication) -> response.setStatus(204))
+                        .clearAuthentication(true))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(API_PUBLIC_ALL).permitAll()
+                        .anyRequest().authenticated());
 
         return http.build();
     }
@@ -56,9 +59,8 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of(
-            API_VUE,
-            API_DNS
-        ));
+                API_VUE,
+                API_DNS));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
@@ -66,7 +68,7 @@ public class SecurityConfig {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-        
+
         return source;
     }
 }

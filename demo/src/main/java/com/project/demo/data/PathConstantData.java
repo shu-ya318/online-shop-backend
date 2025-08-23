@@ -17,6 +17,6 @@ public class PathConstantData {
 	public static final String API_LOGIN = "/public/user/login";
 	public static final String API_LOGOUT = "/user/logout";
 	public static final String API_CURRENT_USER = "/user/me";
-	public static final String API_UPDATE_PROFILE = "/user/me/profile";
+	public static final String API_UPDATE_USER = "/user/me/profile";
 	public static final String API_UPDATE_PASSWORD = "/user/me/password";
 }

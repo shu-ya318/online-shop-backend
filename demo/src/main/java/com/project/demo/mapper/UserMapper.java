@@ -9,16 +9,15 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(
-	componentModel = "spring", 
-	unmappedTargetPolicy = ReportingPolicy.IGNORE,
-	uses = {User.class, UserRegisterRequestDTO.class}
-)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
 	User toUser(UserRegisterRequestDTO dto);
-	
-	UserResponseDTO toResponseDto(User user);
 
 	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 	void updateUserFromUserRegisterRequestDTO(UserRegisterRequestDTO dto, @MappingTarget User user);
+
+	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+	void updateUserFromUserUpdateRequestDTO(UserUpdateRequestDTO dto, @MappingTarget User user);
+
+	UserResponseDTO toResponseDto(User user);
 }

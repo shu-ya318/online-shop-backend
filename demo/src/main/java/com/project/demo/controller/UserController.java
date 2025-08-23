@@ -4,12 +4,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.project.demo.security.JwtUtil;
 import com.project.demo.model.User;
 import com.project.demo.dto.user.UserLoginRequestDTO;
+import com.project.demo.dto.user.UserPasswordUpdateRequestDTO;
 import com.project.demo.dto.user.UserRegisterRequestDTO;
-import com.project.demo.dto.user.UserResponseDTO;
+// import com.project.demo.dto.user.UserResponseDTO;
+import com.project.demo.dto.user.UserUpdateRequestDTO;
 import com.project.demo.service.UserService;
 
 import jakarta.validation.Valid;
@@ -23,13 +26,15 @@ import static com.project.demo.data.PathConstantData.API_VUE;
 //import static com.project.demo.data.PathConstantData.API_PUBLIC;
 import static com.project.demo.data.PathConstantData.API_REGISTER;
 import static com.project.demo.data.PathConstantData.API_LOGIN;
-import static com.project.demo.data.PathConstantData.API_LOGOUT;
+// import static com.project.demo.data.PathConstantData.API_LOGOUT;
 import static com.project.demo.data.PathConstantData.API_CURRENT_USER;
+import static com.project.demo.data.PathConstantData.API_UPDATE_USER;
+import static com.project.demo.data.PathConstantData.API_UPDATE_PASSWORD;
 
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin(origins = API_VUE)
-//@RequestMapping(API_PUBLIC)
+// @RequestMapping(API_PUBLIC)
 public class UserController {
 
     private final UserService userService;
@@ -44,22 +49,19 @@ public class UserController {
     public ResponseEntity<?> register(@Valid @RequestBody UserRegisterRequestDTO dto) {
         try {
             userService.register(dto);
-            return ResponseEntity.ok("Registration successful!");
+            return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", Map.of("message", "Email already registered")));
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", Map.of("message", "An unexpected error occurred. Please try again later.")));
+                    .body(Map.of("message", "An unexpected error occurred. Please try again later!"));
         }
     }
 
     @PostMapping(API_LOGIN)
     public ResponseEntity<?> login(@Valid @RequestBody UserLoginRequestDTO dto) {
         try {
-            if (dto == null) {
-                throw new IllegalArgumentException("Login data cannot be empty");
-            }
             Optional<User> optionalUser = userService.getUserByEmail(dto.email());
 
             if (optionalUser.isEmpty()) {
@@ -74,26 +76,67 @@ public class UserController {
             }
 
             String jwt = jwtUtil.generateToken(user.getEmail(), user.getUserRoles());
-
             return ResponseEntity.ok(Map.of("token", jwt));
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", Map.of("message", "An unexpected error occurred. Please try again later.")));
+                    .body(Map.of("message", "An unexpected error occurred. Please try again later!"));
         }
     }
 
-    @PostMapping(API_LOGOUT)
-    public ResponseEntity<?> logout() {
-        return ResponseEntity.ok(Map.of("message", "Logout successful"));
-    }
+    // @PostMapping(API_LOGOUT)
+    // public ResponseEntity<?> logout() {
+    // return ResponseEntity.noContent().build();
+    // }
 
     /*
      * GET method
      */
 
     @GetMapping(API_CURRENT_USER)
-    public ResponseEntity<UserResponseDTO> getCurrentUser(Principal principal) {
-        return ResponseEntity.ok(userService.getUserResponseDTOByEmail(principal.getName()));
+    public ResponseEntity<?> getCurrentUser(Principal principal) {
+        try {
+            return ResponseEntity.ok(userService.getUserResponseDTOByEmail(principal.getName()));
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "An unexpected error occurred. Please try again later!"));
+        }
+    }
+
+    /*
+     * PUT
+     */
+    @PutMapping(API_UPDATE_USER)
+    public ResponseEntity<?> updateUser(Principal principal,
+            @Valid @RequestBody UserUpdateRequestDTO user) {
+        try {
+            return ResponseEntity.ok(userService.updateUser(principal.getName(), user));
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "An unexpected error occurred while updating user profile."));
+        }
+    }
+
+    @PutMapping(API_UPDATE_PASSWORD)
+    public ResponseEntity<?> updatePassword(Principal principal,
+            @Valid @RequestBody UserPasswordUpdateRequestDTO passwordUpdateDTO) {
+        try {
+            userService.updatePassword(principal.getName(), passwordUpdateDTO);
+            return ResponseEntity.noContent().build();
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "An unexpected error occurred."));
+        }
     }
 }
