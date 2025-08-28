@@ -16,6 +16,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	Optional<User> findByEmail(String email);
 
+	Optional<User> findByUuid(String uuid);
+
+	Optional<User> findByRefreshToken(String refreshToken);
+
     // ===== 後台 =====
 
 }

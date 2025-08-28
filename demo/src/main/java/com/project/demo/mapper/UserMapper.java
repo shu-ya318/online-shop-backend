@@ -13,6 +13,8 @@ import org.mapstruct.ReportingPolicy;
 public interface UserMapper {
 	User toUser(UserRegisterRequestDTO dto);
 
+	UserLoginResponseDTO toUserLoginResponseDTO(String accessToken);
+
 	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 	void updateUserFromUserRegisterRequestDTO(UserRegisterRequestDTO dto, @MappingTarget User user);
 

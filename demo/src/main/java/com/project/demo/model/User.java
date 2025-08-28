@@ -28,7 +28,7 @@ import lombok.ToString;
 @Setter
 @ToString(exclude = "password")
 public class User implements UserDetails {
-	 private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     // ===== 主鍵 =====
     @Id
@@ -37,13 +37,13 @@ public class User implements UserDetails {
     private Long id;
 
     // ===== 基本資訊 =====
-    @Column(name = "uuid",nullable = false, unique = true, updatable = false)
-	private String uuid;
+    @Column(name = "uuid", nullable = false, unique = true, updatable = false)
+    private String uuid;
 
     @Column(name = "email", nullable = false, unique = true, length = 255)
     private String email;
 
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(name = "password", length = 255)
     private String password; // 已加密
 
     @Column(name = "phone_number", length = 20)
@@ -64,18 +64,24 @@ public class User implements UserDetails {
     @Column(name = "auth_provider", length = 20)
     private AuthProvider authProvider = AuthProvider.LOCAL;
 
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
+    @Column(name = "refresh_token_expiry")
+    private LocalDateTime refreshTokenExpiry;
+
     // ===== 審計欄位 =====
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @Column(name = "created_by", updatable = false, length = 50)
-    private String createdBy = "system";
+    private String createdBy;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 
     @Column(name = "updated_by", length = 50)
-    private String updatedBy = "system";
+    private String updatedBy;
 
     // ===== 登入資訊 =====
     @Column(name = "last_login_at")
@@ -90,20 +96,20 @@ public class User implements UserDetails {
 
     @Column(name = "password_changed_at")
     private LocalDateTime passwordChangedAt;
-    
+
     // ===== 個人資料 =====
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
-    @Column(name = "birth", nullable = false)
+    @Column(name = "birth")
     private LocalDate birth;
 
-    @Column(name = "address", nullable = false, length = 255)
+    @Column(name = "address", length = 255)
     private String address;
 
     @Column(name = "avatar_url", length = 255)
     private String avatarUrl;
-    
+
     // ===== 軟刪除 =====
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
@@ -114,8 +120,10 @@ public class User implements UserDetails {
     // ===== equals 與 hashCode 只比對主鍵 =====
     @Override
     public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
+        if (this == object)
+            return true;
+        if (object == null || getClass() != object.getClass())
+            return false;
 
         User user = (User) object;
 
@@ -127,35 +135,35 @@ public class User implements UserDetails {
         return Objects.hash(id);
     }
 
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return this.userRoles.stream()
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.userRoles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.name()))
                 .collect(Collectors.toSet());
-	}
+    }
 
-	@Override
-	public String getUsername() {
-		return this.email;
-	}
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
 
-	@Override
-	public boolean isAccountNonExpired() {
-		return true;
-	}
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
-	@Override
-	public boolean isAccountNonLocked() {
-		return this.accountStatus != AccountStatus.LOCKED;
-	}
+    @Override
+    public boolean isAccountNonLocked() {
+        return this.accountStatus != AccountStatus.LOCKED;
+    }
 
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
-	@Override
-	public boolean isEnabled() {
-		return this.accountStatus == AccountStatus.ACTIVE;
-	}
+    @Override
+    public boolean isEnabled() {
+        return this.accountStatus == AccountStatus.ACTIVE;
+    }
 }
