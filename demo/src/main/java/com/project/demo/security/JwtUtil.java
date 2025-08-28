@@ -1,5 +1,6 @@
 package com.project.demo.security;
 
+import java.util.UUID;
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -48,10 +49,10 @@ public class JwtUtil {
 		}
 	}
 
-	public String generateAccessToken(Long id, String uuid, String email, Set<String> roles) {
+	public String generateAccessToken(Long id, UUID uuid, String email, Set<String> roles) {
 		try {
 			String accessToken = Jwts.builder()
-					.setSubject(uuid)
+					.setSubject(uuid.toString())
 					.claim("id", id)
 					.claim("email", email)
 					.claim("roles", roles)
@@ -66,10 +67,10 @@ public class JwtUtil {
 		}
 	}
 
-	public String generateRefreshToken(String uuid) {
+	public String generateRefreshToken(UUID uuid) {
 		try {
 			String refreshToken = Jwts.builder()
-					.setSubject(uuid)
+					.setSubject(uuid.toString())
 					.setIssuedAt(new Date())
 					.setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
 					.signWith(key, SignatureAlgorithm.HS256)
@@ -95,9 +96,9 @@ public class JwtUtil {
 		}
 	}
 
-	public boolean validateRefreshToken(String uuid, String refreshToken) {
+	public boolean validateRefreshToken(UUID uuid, String refreshToken) {
 		try {
-			String stored = redisTemplate.opsForValue().get("refresh_token:" + uuid);
+			String stored = redisTemplate.opsForValue().get("refresh_token:" + uuid.toString());
 
 			if (stored == null || !stored.equals(refreshToken)) {
 				return false;
@@ -112,15 +113,15 @@ public class JwtUtil {
 		}
 	}
 
-	public String refreshAccessToken(Long id, String uuid, String email, Set<String> roles, String refreshToken) {
+	public String refreshAccessToken(Long id, UUID uuid, String email, Set<String> roles, String refreshToken) {
 		if (!validateRefreshToken(uuid, refreshToken))
 			throw new RuntimeException("Invalid refresh token");
 
 		return generateAccessToken(id, uuid, email, roles);
 	}
 
-	public void revokeRefreshToken(String uuid) {
-		redisTemplate.delete("refresh_token:" + uuid);
+	public void revokeRefreshToken(UUID uuid) {
+		redisTemplate.delete("refresh_token:" + uuid.toString());
 	}
 
 	public long getRefreshTokenExpiration() {
@@ -128,7 +129,8 @@ public class JwtUtil {
 	}
 
 	public String getEmailFromToken(String token) {
-		return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().get("email", String.class);
+		return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().get("email",
+				String.class);
 	}
 
 	public String getUuidFromRefreshToken(String refreshToken) {

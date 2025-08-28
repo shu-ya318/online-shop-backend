@@ -7,13 +7,5 @@ package com.project.demo.dto.user;
 
 public record UserLoginResponseDTO (
     String accessToken
-    // Long id,    
-    // String email,
-    // String name,
-    // String phoneNumber,
-    // String address,
-    // boolean active,
-    // AuthProvider authProvider,
-    // Set<Role> userRoles,
 ) {
 }

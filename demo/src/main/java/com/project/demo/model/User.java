@@ -1,5 +1,6 @@
 package com.project.demo.model;
 
+import java.util.UUID;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -38,7 +39,7 @@ public class User implements UserDetails {
 
     // ===== 基本資訊 =====
     @Column(name = "uuid", nullable = false, unique = true, updatable = false)
-    private String uuid;
+    private UUID uuid;
 
     @Column(name = "email", nullable = false, unique = true, length = 255)
     private String email;
@@ -71,10 +72,10 @@ public class User implements UserDetails {
     private LocalDateTime refreshTokenExpiry;
 
     // ===== 審計欄位 =====
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "created_by", updatable = false, length = 50)
+    @Column(name = "created_by", nullable = false, updatable = false, length = 50)
     private String createdBy;
 
     @Column(name = "updated_at")

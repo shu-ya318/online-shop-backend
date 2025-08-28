@@ -53,7 +53,7 @@ public class UserService {
         Optional<User> optionalUser = userRepository.findByEmail(dto.email());
 
         User user;
-        
+
         if (optionalUser.isPresent()) {
             if (!optionalUser.get().isDeleted()) {
                 System.out.println("Email already registered");
@@ -68,14 +68,14 @@ public class UserService {
             user = userMapper.toUser(dto);
         }
 
-        user.setUuid(UUID.randomUUID().toString());
+        user.setUuid(UUID.randomUUID());
         user.setPassword(passwordEncoder.encode(dto.password()));
         user.setAccountStatus(AccountStatus.ACTIVE);
         user.setUserRoles(Set.of(Role.CUSTOMER));
         user.setAuthProvider(AuthProvider.LOCAL);
         user.setCreatedAt(LocalDateTime.now());
         user.setCreatedBy("system");
-        
+
         userRepository.save(user);
     }
 
@@ -101,11 +101,12 @@ public class UserService {
 
         // 處理 Token，提供給客戶端
         var roles = user.getUserRoles().stream().map(Enum::name).collect(Collectors.toSet());
-        String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUuid(), user.getEmail(), roles);
+        String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUuid(), user.getEmail(),
+                roles);
 
         String refreshToken = jwtUtil.generateRefreshToken(user.getUuid());
 
-        redisService.saveRefreshToken(user.getUuid(), refreshToken, jwtUtil.getRefreshTokenExpiration(),
+        redisService.saveRefreshToken(user.getUuid().toString(), refreshToken, jwtUtil.getRefreshTokenExpiration(),
                 java.util.concurrent.TimeUnit.MILLISECONDS);
 
         Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
@@ -143,11 +144,11 @@ public class UserService {
             throw new RuntimeException("Invalid refresh token format");
         }
 
-        if (!jwtUtil.validateRefreshToken(uuid, refreshToken)) {
+        if (!jwtUtil.validateRefreshToken(UUID.fromString(uuid), refreshToken)) {
             throw new RuntimeException("Invalid or expired refresh token");
         }
 
-        User user = userRepository.findByUuid(uuid)
+        User user = userRepository.findByUuid(UUID.fromString(uuid))
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (user.isDeleted()) {
@@ -158,8 +159,6 @@ public class UserService {
                 user.getUserRoles().stream().map(Enum::name).collect(Collectors.toSet()));
         return accessToken;
     }
-
-
 
     // Get Current User Info
     public UserResponseDTO getUserResponseDTOByEmail(String email) {

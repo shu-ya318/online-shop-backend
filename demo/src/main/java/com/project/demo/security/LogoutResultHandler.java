@@ -3,6 +3,7 @@ package com.project.demo.security;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,7 +44,7 @@ public class LogoutResultHandler implements LogoutSuccessHandler {
             // 移除Redis的refreshToken
             if (refreshToken != null) {
                 String uuid = jwtUtil.getUuidFromRefreshToken(refreshToken);
-                jwtUtil.revokeRefreshToken(uuid);
+                jwtUtil.revokeRefreshToken(UUID.fromString(uuid));
             }
 
             Cookie deleteCookie = new Cookie("refreshToken", null);

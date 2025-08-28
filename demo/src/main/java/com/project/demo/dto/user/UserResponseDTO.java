@@ -1,7 +1,9 @@
 package com.project.demo.dto.user;
 
+import java.util.UUID;
+
 public record UserResponseDTO(
-	String uuid, 
+	UUID uuid, 
 	String email, 
 	String name, 
 	String phoneNumber,

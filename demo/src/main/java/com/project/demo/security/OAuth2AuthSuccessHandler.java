@@ -55,14 +55,15 @@ public class OAuth2AuthSuccessHandler implements AuthenticationSuccessHandler {
         userRepository.save(user);
 
         var roles = user.getUserRoles().stream().map(Enum::name).collect(Collectors.toSet());
-        String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUuid(), user.getEmail(), roles);
+        String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUuid(), user.getEmail(),
+                roles);
 
         String refreshToken = jwtUtil.generateRefreshToken(user.getUuid());
 
         System.out.println("Access Token: " + accessToken);
         System.out.println("Refresh Token: " + refreshToken);
 
-        redisService.saveRefreshToken(user.getUuid(), refreshToken, jwtUtil.getRefreshTokenExpiration(),
+        redisService.saveRefreshToken(user.getUuid().toString(), refreshToken, jwtUtil.getRefreshTokenExpiration(),
                 java.util.concurrent.TimeUnit.MILLISECONDS);
 
         Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
@@ -79,7 +80,7 @@ public class OAuth2AuthSuccessHandler implements AuthenticationSuccessHandler {
     private User createNewOAuth2User(DefaultOAuth2User oauth2User, HttpServletRequest request) {
         User user = new User();
 
-        user.setUuid(UUID.randomUUID().toString());
+        user.setUuid(UUID.randomUUID());
         user.setEmail(oauth2User.getAttribute("email"));
         user.setName(oauth2User.getAttribute("name"));
         user.setAccountStatus(AccountStatus.ACTIVE);
