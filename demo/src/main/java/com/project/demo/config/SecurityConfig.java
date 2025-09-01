@@ -47,20 +47,20 @@ public class SecurityConfig {
         @Bean
         SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http
-                                .cors(cors -> {
-                                })
-                                .csrf(csrf -> csrf.disable())
-                                .sessionManagement(session -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                                .oauth2Login(oauth2 -> oauth2
-                                                .successHandler(oAuth2AuthSuccessHandler))
-                                .logout(logout -> logout.logoutUrl(API_LOGOUT)
-                                                .logoutSuccessHandler(logoutResultHandler)
-                                                .clearAuthentication(true))
-                                .exceptionHandling(exceptions -> exceptions
-                                                .authenticationEntryPoint(customAuthenticationEntryPoint()))
-                                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                                .authorizeHttpRequests(auth -> auth
+                        .cors(cors -> {
+                        })
+                        .csrf(csrf -> csrf.disable())
+                        .sessionManagement(session -> session
+                                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .oauth2Login(oauth2 -> oauth2
+                                        .successHandler(oAuth2AuthSuccessHandler))
+                        .logout(logout -> logout.logoutUrl(API_LOGOUT)
+                                        .logoutSuccessHandler(logoutResultHandler)
+                                        .clearAuthentication(true))
+                        .exceptionHandling(exceptions -> exceptions
+                                        .authenticationEntryPoint(customAuthenticationEntryPoint()))
+                        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                                                        .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(API_PUBLIC_ALL, API_REFRESH_TOKEN, API_LOGOUT).permitAll()
                                                 .anyRequest().authenticated());
                 return http.build();

@@ -34,7 +34,20 @@ public class RedisService {
   return redisTemplate.hasKey("blacklist:" + token);
  }
 
- // 帳號啟動碼
+  // ===== OAuth2 授權碼 ===== 
+  public void saveOAuth2AuthCode(String oauth2Code, String userId, long duration, TimeUnit unit) {
+    redisTemplate.opsForValue().set("oauth2authcode:" + oauth2Code, userId, duration, unit);
+   }
+  
+   public String getOAuth2AuthCode(String oauth2Code) {
+    return redisTemplate.opsForValue().get("oauth2authcode:" + oauth2Code);
+   }
+  
+   public void deleteOAuth2AuthCode(String oauth2Code) {
+    redisTemplate.delete("oauth2authcode:" + oauth2Code);
+   }
+
+ // ===== 帳號啟動碼 ===== 
  public void saveActivationCode(String email, String code) {
   redisTemplate.opsForValue().set("activation:" + email, code, 15, TimeUnit.MINUTES);
  }
@@ -47,7 +60,7 @@ public class RedisService {
   redisTemplate.delete("activation:" + email);
  }
 
- // 密碼重置碼
+ // ===== 密碼重置碼 ===== 
  public void savePasswordResetCode(String email, String code) {
   redisTemplate.opsForValue().set("pwdreset:" + email, code, 15, TimeUnit.MINUTES);
  }
@@ -60,7 +73,7 @@ public class RedisService {
   redisTemplate.delete("pwdreset:" + email);
  }
 
- // 2FA 驗證碼
+ // ===== 2FA 驗證碼 ===== 
  public void saveTwoFactorCode(String email, String code) {
   redisTemplate.opsForValue().set("2fa:" + email, code, 5, TimeUnit.MINUTES);
  }
@@ -91,7 +104,7 @@ public class RedisService {
   redisTemplate.delete("failedlogin:" + email);
  }
 
- // 帳號鎖定時間 (存解鎖時間的時間戳字串)
+ // ===== 帳號鎖定時間 ===== 
  public void setAccountLockUntil(String email, long timestamp) {
   redisTemplate.opsForValue().set("lockuntil:" + email, String.valueOf(timestamp), 1, TimeUnit.HOURS);
  }

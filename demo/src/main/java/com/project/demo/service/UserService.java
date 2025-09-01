@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.Cookie;
@@ -56,7 +55,6 @@ public class UserService {
 
         if (optionalUser.isPresent()) {
             if (!optionalUser.get().isDeleted()) {
-                System.out.println("Email already registered");
                 throw new IllegalArgumentException("Email already registered");
             }
 
@@ -80,7 +78,7 @@ public class UserService {
     }
 
     // Login
-    public UserLoginResponseDTO login(@RequestBody UserLoginRequestDTO dto) {
+    public UserLoginResponseDTO login(UserLoginRequestDTO dto) {
         User user = userRepository.findByEmail(dto.email())
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));
 
@@ -118,6 +116,38 @@ public class UserService {
 
         UserLoginResponseDTO loginResponse = userMapper.toUserLoginResponseDTO(accessToken);
         return loginResponse;
+    }
+
+    // OAuth2 Authorization Code Exchange
+    @Transactional
+    public UserLoginResponseDTO exchangeOAuth2Code(String oauth2Code) {
+        String redisOAuth2Code = redisService.getOAuth2AuthCode(oauth2Code);
+        if (redisOAuth2Code == null) {
+            throw new RuntimeException("oauth2 code not found in redis");
+        }
+
+        User user = userRepository.findByUuid(UUID.fromString(redisOAuth2Code))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.isDeleted()) {
+            throw new RuntimeException("User account is deleted");
+        }
+
+        var roles = user.getUserRoles().stream().map(Enum::name).collect(Collectors.toSet());
+        String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUuid(), user.getEmail(), roles);
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUuid());
+
+        redisService.saveRefreshToken(user.getUuid().toString(), refreshToken, jwtUtil.getRefreshTokenExpiration(),
+                java.util.concurrent.TimeUnit.MILLISECONDS);
+
+        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setSecure(true);
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge((int) jwtUtil.getRefreshTokenExpiration() / 1000);
+        response.addCookie(refreshCookie);
+
+        return userMapper.toUserLoginResponseDTO(accessToken);
     }
 
     // Refresh Token

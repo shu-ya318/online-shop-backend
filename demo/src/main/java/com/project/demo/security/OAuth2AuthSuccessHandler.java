@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import com.project.demo.enumeration.AccountStatus;
 import com.project.demo.enumeration.AuthProvider;
 import com.project.demo.enumeration.Role;
-// import com.project.demo.enumeration.UpdateSource;
 import com.project.demo.model.User;
 import com.project.demo.repository.UserRepository;
 import com.project.demo.service.RedisService;
@@ -23,7 +22,6 @@ import com.project.demo.service.RedisService;
 import static com.project.demo.data.PathConstantData.API_VUE;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +30,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OAuth2AuthSuccessHandler implements AuthenticationSuccessHandler {
 
-    private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final RedisService redisService;
 
@@ -54,26 +51,10 @@ public class OAuth2AuthSuccessHandler implements AuthenticationSuccessHandler {
 
         userRepository.save(user);
 
-        var roles = user.getUserRoles().stream().map(Enum::name).collect(Collectors.toSet());
-        String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUuid(), user.getEmail(),
-                roles);
-
-        String refreshToken = jwtUtil.generateRefreshToken(user.getUuid());
-
-        System.out.println("Access Token: " + accessToken);
-        System.out.println("Refresh Token: " + refreshToken);
-
-        redisService.saveRefreshToken(user.getUuid().toString(), refreshToken, jwtUtil.getRefreshTokenExpiration(),
-                java.util.concurrent.TimeUnit.MILLISECONDS);
-
-        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
-        refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(true);
-        refreshCookie.setPath("/");
-        refreshCookie.setMaxAge((int) jwtUtil.getRefreshTokenExpiration() / 1000);
-        response.addCookie(refreshCookie);
-
-        String redirectUrl = API_VUE + "?token=" + accessToken;
+        String oauth2Code = UUID.randomUUID().toString();
+        redisService.saveOAuth2AuthCode(oauth2Code, user.getUuid().toString(), 5, TimeUnit.MINUTES);
+        
+        String redirectUrl = API_VUE + "?oauth2Code=" + oauth2Code;
         response.sendRedirect(redirectUrl);
     }
 

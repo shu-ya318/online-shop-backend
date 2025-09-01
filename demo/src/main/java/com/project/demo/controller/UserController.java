@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import com.project.demo.dto.user.OAuth2CodeRequestDTO;
 import com.project.demo.dto.user.UserLoginRequestDTO;
 import com.project.demo.dto.user.UserLoginResponseDTO;
 import com.project.demo.dto.user.UserPasswordUpdateRequestDTO;
@@ -18,19 +19,16 @@ import lombok.RequiredArgsConstructor;
 import java.security.Principal;
 import java.util.Map;
 
-import static com.project.demo.data.PathConstantData.API_VUE;
-//import static com.project.demo.data.PathConstantData.API_PUBLIC;
 import static com.project.demo.data.PathConstantData.API_REGISTER;
 import static com.project.demo.data.PathConstantData.API_LOGIN;
 import static com.project.demo.data.PathConstantData.API_CURRENT_USER;
 import static com.project.demo.data.PathConstantData.API_UPDATE_USER;
 import static com.project.demo.data.PathConstantData.API_UPDATE_PASSWORD;
 import static com.project.demo.data.PathConstantData.API_REFRESH_TOKEN;
+import static com.project.demo.data.PathConstantData.API_OAUTH2_EXCHANGE_CODE;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = API_VUE)
-// @RequestMapping(API_PUBLIC)
 public class UserController {
 
     private final UserService userService;
@@ -84,10 +82,33 @@ public class UserController {
 
             return ResponseEntity.ok(Map.of("accessToken", accessToken));
         } catch (RuntimeException e) {
-            System.out.println("Refresh token failed: " + e.getMessage());
-
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Refresh token failed"));
+                    .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "An unexpected error occurred. Please try again later!"));
+        }
+    }
+
+    @PostMapping(API_OAUTH2_EXCHANGE_CODE)
+    public ResponseEntity<?> exchangeOAuth2Code(@Valid @RequestBody OAuth2CodeRequestDTO dto) {
+        try {
+            UserLoginResponseDTO responseDTO = userService.exchangeOAuth2Code(dto.getOauth2Code());
+            return ResponseEntity.ok(responseDTO);
+        } catch (RuntimeException e) {
+            if ("oauth2 code not found in redis".equals(e.getMessage())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("message", e.getMessage()));
+            } else if ("User not found".equals(e.getMessage())) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("message", e.getMessage()));
+            } else if ("User account is deleted".equals(e.getMessage())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", e.getMessage()));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", e.getMessage()));
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "An unexpected error occurred. Please try again later!"));
