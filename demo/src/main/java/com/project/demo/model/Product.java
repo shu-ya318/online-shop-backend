@@ -14,7 +14,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-// import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 import lombok.Getter;
@@ -60,7 +59,7 @@ public class Product {
 	@Column(name = "discount_percentage", precision = 5, scale = 2)
 	private BigDecimal discountPercentage;
 
-	@Column(name = "description")
+	@Column(name = "description", nullable = false)
 	private String description;
 
 	@Enumerated(EnumType.STRING)
@@ -75,11 +74,4 @@ public class Product {
 
 	@Column(name = "image_url")
 	private String imageUrl;
-
-	// @PrePersist
-	// public void onCreate() {
-	// if (this.uuid == null) {
-	// this.uuid = UUID.randomUUID().toString();
-	// }
-	// }
 }

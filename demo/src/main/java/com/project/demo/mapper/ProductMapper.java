@@ -2,6 +2,7 @@ package com.project.demo.mapper;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 import com.project.demo.dto.project.ProductResponseDTO;
 import com.project.demo.model.Product;
@@ -17,6 +18,9 @@ public interface ProductMapper {
     @Mapping(target = "discountPrice", source = "product", qualifiedByName = "calculateDiscountPrice")
     ProductResponseDTO toProductResponseDTO(Product product);
 
+    List<ProductResponseDTO> toResponseDTO(List<Product> products);
+
+    // Utils
     @Named("calculateDiscountPrice")
     default BigDecimal calculateDiscountPrice(Product product) {
         if (product == null || product.getPrice() == null || product.getDiscountPercentage() == null) {

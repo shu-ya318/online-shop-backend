@@ -23,6 +23,6 @@ public class PathConstantData {
 	public static final String API_UPDATE_PASSWORD = "/user/me/password";
 
 	/* PRODUCT */
-	public static final String API_PRODUCT = "/products";
+	public static final String API_PRODUCTS = "/products";
 	public static final String API_PRODUCT_BY_UUID = "/products/{uuid}";
 }
