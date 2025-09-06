@@ -59,10 +59,7 @@ public class UserController {
 
             return ResponseEntity.ok(responseDTO);
         } catch (RuntimeException e) {
-            if ("Invalid email or password".equals(e.getMessage())) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("message", e.getMessage()));
-            } else if ("User is deleted".equals(e.getMessage())) {
+            if ("User is deleted".equals(e.getMessage())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("message", e.getMessage()));
             } else {
