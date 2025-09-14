@@ -30,8 +30,9 @@ public interface CartMapper {
     // 2.複雜的物件集合轉換
     @Mapping(target = "items", source = "items", qualifiedByName = "toCartItemDTOs")
     // 3.動態計算的欄位
+    @Mapping(target = "subtotal", source = "items", qualifiedByName = "calculateSubtotal")
+    @Mapping(target = "shipping", source = "items", qualifiedByName = "calculateShipping")
     @Mapping(target = "total", source = "items", qualifiedByName = "calculateTotal")
-    @Mapping(target = "discountTotal", source = "items", qualifiedByName = "calculateDiscountTotal")
     @Mapping(target = "totalQuantity", source = "items", qualifiedByName = "calculateTotalQuantity")
     CartResponseDTO toCartResponseDTO(Cart cart);
 
@@ -68,22 +69,21 @@ public interface CartMapper {
     }
 
     // Utils
-    @Named("calculateTotal")
-    default BigDecimal calculateTotal(Set<CartItem> items) {
-        if (items == null || items.isEmpty()) {
-            return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+    @Named("calculateTotalQuantity")
+    default Integer calculateTotalQuantity(Set<CartItem> items) {
+        if (items == null) {
+            return 0;
         }
 
         return items.stream()
-                .map(item -> item.getProduct().getPrice().multiply(new BigDecimal(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .setScale(2, RoundingMode.HALF_UP);
+                .mapToInt(CartItem::getQuantity)
+                .sum();
     }
 
-    @Named("calculateDiscountTotal")
-    default BigDecimal calculateDiscountTotal(Set<CartItem> items) {
+    @Named("calculateSubtotal")
+    default BigDecimal calculateSubtotal(Set<CartItem> items) {
         if (items == null || items.isEmpty()) {
-            return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+            return BigDecimal.ZERO.setScale(0, RoundingMode.HALF_UP);
         }
 
         ProductMapper productMapper = Mappers.getMapper(ProductMapper.class);
@@ -94,17 +94,25 @@ public interface CartMapper {
                     return discountPrice.multiply(new BigDecimal(item.getQuantity()));
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .setScale(2, RoundingMode.HALF_UP);
+                .setScale(0, RoundingMode.HALF_UP);
     }
 
-    @Named("calculateTotalQuantity")
-    default Integer calculateTotalQuantity(Set<CartItem> items) {
-        if (items == null) {
-            return 0;
-        }
+    @Named("calculateShipping")
+    default BigDecimal calculateShipping(Set<CartItem> items) {
+        BigDecimal subtotal = calculateSubtotal(items);
 
-        return items.stream()
-                .mapToInt(CartItem::getQuantity)
-                .sum();
+        if (subtotal.compareTo(new BigDecimal("300")) >= 0) {
+            return BigDecimal.ZERO.setScale(0, RoundingMode.HALF_UP);
+        } else {
+            return new BigDecimal("60").setScale(0, RoundingMode.HALF_UP);
+        }
+    }
+
+    @Named("calculateTotal")
+    default BigDecimal calculateTotal(Set<CartItem> items) {
+        BigDecimal subtotal = calculateSubtotal(items);
+        BigDecimal shipping = calculateShipping(items);
+
+        return subtotal.add(shipping).setScale(0, RoundingMode.HALF_UP);
     }
 }

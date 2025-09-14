@@ -38,7 +38,7 @@ public class Cart {
 
     // ===== 基本資訊 =====
     @Column(name = "uuid", nullable = false, unique = true, updatable = false)
-    private UUID uuid; // Cart的UUID
+    private UUID uuid;
 
     // ===== 關聯 =====
     @OneToOne(fetch = FetchType.LAZY)

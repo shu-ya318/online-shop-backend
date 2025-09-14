@@ -8,8 +8,9 @@ public record CartResponseDTO(
 	UUID cartUuid,
     UUID userUuid,
     List<CartItemDTO> items, // 有序性、易用性(便於客戶端把List 序列化成 JSON 陣列)
+    BigDecimal subtotal,
+    BigDecimal shipping,
     BigDecimal total,
-    BigDecimal discountTotal,
     Integer totalQuantity
 ) {
 }
