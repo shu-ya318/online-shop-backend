@@ -1,7 +1,6 @@
-package com.project.demo.dto.project;
+package com.project.demo.dto.product;
 
 import java.math.BigDecimal;
-//import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.project.demo.enumeration.AvailabilityStatus;
@@ -11,8 +10,6 @@ public record ProductResponseDTO(
 	UUID uuid, 
 	String name, 
 	AvailabilityStatus availabilityStatus, 
-//	LocalDateTime createdAt, 
-//	LocalDateTime updatedAt, 
 	String sku,
 	BigDecimal price,
 	BigDecimal discountPercentage,

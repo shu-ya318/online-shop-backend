@@ -4,17 +4,14 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
-//import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-//import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-//import org.springframework.util.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.project.demo.dto.common.PaginatedResponse;
-import com.project.demo.dto.project.ProductFilterRequestDTO;
-import com.project.demo.dto.project.ProductResponseDTO;
-//import com.project.demo.enumeration.Category;
+import com.project.demo.dto.product.ProductFilterRequestDTO;
+import com.project.demo.dto.product.ProductResponseDTO;
+import com.project.demo.enumeration.AvailabilityStatus;
 import com.project.demo.mapper.ProductMapper;
 import com.project.demo.model.Product;
 import com.project.demo.repository.ProductRepository;
@@ -31,14 +28,13 @@ public class ProductService {
 
 	// Get products
 	public PaginatedResponse<ProductResponseDTO> getProducts(ProductFilterRequestDTO filter, Pageable pageable) {
-		// Sort sortOrder = parseSort(sort);
-		// Pageable pageable = PageRequest.of(page, size, sortOrder);
-
 		Specification<Product> specification = ProductSpecifications.doFilter(filter);
 
 		Page<Product> productPage = productRepository.findAll(specification, pageable);
 
-		List<ProductResponseDTO> productDTOs = productMapper.toResponseDTO(productPage.getContent());
+		List<ProductResponseDTO> productDTOs = productMapper.toResponseDTOs(productPage.getContent()).stream()
+				.map(this::updateAvailabilityByStock)
+				.toList();
 
 		return new PaginatedResponse<>(
 				productDTOs,
@@ -53,6 +49,33 @@ public class ProductService {
 		Product product = productRepository.findByUuid(uuid)
 				.orElseThrow(() -> new RuntimeException("Product not found with uuid: " + uuid));
 
-		return productMapper.toProductResponseDTO(product);
+		ProductResponseDTO dto = productMapper.toProductResponseDTO(product);
+
+		return updateAvailabilityByStock(dto);
+	}
+
+	// Util
+	private ProductResponseDTO updateAvailabilityByStock(ProductResponseDTO dto) {
+		boolean shouldUpdateToOutOfStock = dto.stock() != null
+				&& dto.stock() <= 0
+				&& dto.availabilityStatus() != AvailabilityStatus.OUT_OF_STOCK;
+
+		if (shouldUpdateToOutOfStock) {
+			return new ProductResponseDTO(
+					dto.uuid(),
+					dto.name(),
+					AvailabilityStatus.OUT_OF_STOCK,
+					dto.sku(),
+					dto.price(),
+					dto.discountPercentage(),
+					dto.discountPrice(),
+					dto.description(),
+					dto.category(),
+					dto.stock(),
+					dto.totalSold(),
+					dto.imageUrl());
+		}
+
+		return dto;
 	}
 }

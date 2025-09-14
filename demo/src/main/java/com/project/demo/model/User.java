@@ -24,7 +24,9 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = {
+    @Index(name = "idx_user_uuid", columnList = "uuid")
+})
 @Getter
 @Setter
 @ToString(exclude = "password")

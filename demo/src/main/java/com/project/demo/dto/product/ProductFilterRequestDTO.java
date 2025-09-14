@@ -1,4 +1,4 @@
-package com.project.demo.dto.project;
+package com.project.demo.dto.product;
 
 import com.project.demo.enumeration.Category;
 

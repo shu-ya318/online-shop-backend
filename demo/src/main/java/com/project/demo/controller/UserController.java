@@ -10,6 +10,7 @@ import com.project.demo.dto.user.UserLoginRequestDTO;
 import com.project.demo.dto.user.UserLoginResponseDTO;
 import com.project.demo.dto.user.UserPasswordUpdateRequestDTO;
 import com.project.demo.dto.user.UserRegisterRequestDTO;
+import com.project.demo.dto.user.UserResponseDTO;
 import com.project.demo.dto.user.UserUpdateRequestDTO;
 import com.project.demo.service.UserService;
 
@@ -55,15 +56,15 @@ public class UserController {
     @PostMapping(API_LOGIN)
     public ResponseEntity<?> login(@Valid @RequestBody UserLoginRequestDTO dto) {
         try {
-            UserLoginResponseDTO responseDTO = userService.login(dto);
+            UserLoginResponseDTO response = userService.login(dto);
 
-            return ResponseEntity.ok(responseDTO);
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             if ("User is deleted".equals(e.getMessage())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("message", e.getMessage()));
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                return ResponseEntity.badRequest()
                         .body(Map.of("message", e.getMessage()));
             }
         } catch (Exception e) {
@@ -90,20 +91,21 @@ public class UserController {
     @PostMapping(API_OAUTH2_EXCHANGE_CODE)
     public ResponseEntity<?> exchangeOAuth2Code(@Valid @RequestBody OAuth2CodeRequestDTO dto) {
         try {
-            UserLoginResponseDTO responseDTO = userService.exchangeOAuth2Code(dto.getOauth2Code());
-            return ResponseEntity.ok(responseDTO);
+            UserLoginResponseDTO response = userService.exchangeOAuth2Code(dto.getOauth2Code());
+
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             if ("oauth2 code not found in redis".equals(e.getMessage())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("message", e.getMessage()));
             } else if ("User not found".equals(e.getMessage())) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("message", e.getMessage()));
+                return ResponseEntity.notFound()
+                        .build();
             } else if ("User account is deleted".equals(e.getMessage())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("message", e.getMessage()));
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                return ResponseEntity.badRequest()
                         .body(Map.of("message", e.getMessage()));
             }
         } catch (Exception e) {
@@ -118,10 +120,12 @@ public class UserController {
     @GetMapping(API_CURRENT_USER)
     public ResponseEntity<?> getCurrentUser(Principal principal) {
         try {
-            return ResponseEntity.ok(userService.getUserResponseDTOByEmail(principal.getName()));
+            UserResponseDTO response = userService.getUserResponseDTOByEmail(principal.getName());
+
+            return ResponseEntity.ok(response);
         } catch (UsernameNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", e.getMessage()));
+            return ResponseEntity.notFound()
+                    .build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "An unexpected error occurred. Please try again later!"));
@@ -133,12 +137,14 @@ public class UserController {
      */
     @PutMapping(API_UPDATE_USER)
     public ResponseEntity<?> updateUser(Principal principal,
-            @Valid @RequestBody UserUpdateRequestDTO user) {
+            @Valid @RequestBody UserUpdateRequestDTO dto) {
         try {
-            return ResponseEntity.ok(userService.updateUser(principal.getName(), user));
+            UserResponseDTO response = userService.updateUser(principal.getName(), dto);
+
+            return ResponseEntity.ok(response);
         } catch (UsernameNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", e.getMessage()));
+            return ResponseEntity.notFound()
+                    .build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "An unexpected error occurred while updating user profile."));
@@ -147,14 +153,14 @@ public class UserController {
 
     @PutMapping(API_UPDATE_PASSWORD)
     public ResponseEntity<?> updatePassword(Principal principal,
-            @Valid @RequestBody UserPasswordUpdateRequestDTO passwordUpdateDTO) {
+            @Valid @RequestBody UserPasswordUpdateRequestDTO dto) {
         try {
-            userService.updatePassword(principal.getName(), passwordUpdateDTO);
+            userService.updatePassword(principal.getName(), dto);
 
             return ResponseEntity.ok(Map.of("message", "Password updated successfully!"));
         } catch (UsernameNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", e.getMessage()));
+            return ResponseEntity.notFound()
+                    .build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", e.getMessage()));

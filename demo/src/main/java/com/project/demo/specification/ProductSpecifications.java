@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
-import com.project.demo.dto.project.ProductFilterRequestDTO;
+import com.project.demo.dto.product.ProductFilterRequestDTO;
 import com.project.demo.model.Product;
 
 import jakarta.persistence.criteria.Predicate;

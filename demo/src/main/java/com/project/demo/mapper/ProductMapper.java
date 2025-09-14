@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
-import com.project.demo.dto.project.ProductResponseDTO;
+import com.project.demo.dto.product.ProductResponseDTO;
 import com.project.demo.model.Product;
 
 import org.mapstruct.Mapper;
@@ -15,20 +15,24 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ProductMapper {
 
+    List<ProductResponseDTO> toResponseDTOs(List<Product> products);
+
     @Mapping(target = "discountPrice", source = "product", qualifiedByName = "calculateDiscountPrice")
     ProductResponseDTO toProductResponseDTO(Product product);
-
-    List<ProductResponseDTO> toResponseDTO(List<Product> products);
 
     // Utils
     @Named("calculateDiscountPrice")
     default BigDecimal calculateDiscountPrice(Product product) {
-        if (product == null || product.getPrice() == null || product.getDiscountPercentage() == null) {
+        if (product == null || product.getPrice() == null) {
             return null;
         }
 
         BigDecimal price = product.getPrice();
         BigDecimal discountPercentage = product.getDiscountPercentage();
+
+        if (discountPercentage == null) {
+            return price;
+        }
 
         BigDecimal discountMultiplier = discountPercentage.divide(new BigDecimal("100"));
         BigDecimal priceMultiplier = BigDecimal.ONE.subtract(discountMultiplier);

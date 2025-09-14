@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.project.demo.dto.project.ProductFilterRequestDTO;
+import com.project.demo.dto.common.PaginatedResponse;
+import com.project.demo.dto.product.ProductFilterRequestDTO;
 import com.project.demo.service.ProductService;
 import com.project.demo.enumeration.Category;
+import com.project.demo.dto.product.ProductResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,7 +48,9 @@ public class ProductController {
             ProductFilterRequestDTO filter = new ProductFilterRequestDTO(keyword, category);
             Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
 
-            return ResponseEntity.ok(productService.getProducts(filter, pageable));
+            PaginatedResponse<ProductResponseDTO> response = productService.getProducts(filter, pageable);
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "An unexpected error occurred. Please try again later!"));
@@ -56,10 +60,12 @@ public class ProductController {
     @GetMapping(API_PRODUCT_BY_UUID)
     public ResponseEntity<?> getProductByUuid(@PathVariable UUID uuid) {
         try {
-            return ResponseEntity.ok(productService.getProductByUuid(uuid));
+            ProductResponseDTO response = productService.getProductByUuid(uuid);
+
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", e.getMessage()));
+            return ResponseEntity.notFound()
+                    .build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "An unexpected error occurred. Please try again later!"));

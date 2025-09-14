@@ -12,17 +12,22 @@ public class PathConstantData {
 	public static final String API_PUBLIC = "/public";
 	public static final String API_PUBLIC_ALL = "/public/**";
 
-	/* USER */
-	public static final String API_REGISTER = "/public/user/register";
-	public static final String API_LOGIN = "/public/user/login";
-	public static final String API_OAUTH2_EXCHANGE_CODE = "/public/user/oauth2/exchange-code";
-	public static final String API_LOGOUT = "/user/logout";
-	public static final String API_REFRESH_TOKEN = "/user/refresh-token";
-	public static final String API_CURRENT_USER = "/user/me";
-	public static final String API_UPDATE_USER = "/user/me/profile";
-	public static final String API_UPDATE_PASSWORD = "/user/me/password";
+	/* USERS */
+	public static final String API_REGISTER = "/public/users/register";
+	public static final String API_LOGIN = "/public/users/login";
+	public static final String API_OAUTH2_EXCHANGE_CODE = "/public/users/oauth2/exchange-code";
+	public static final String API_LOGOUT = "/users/logout";
+	public static final String API_REFRESH_TOKEN = "/users/refresh-token";
+	public static final String API_CURRENT_USER = "/users/me";
+	public static final String API_UPDATE_USER = "/users/me/profile";
+	public static final String API_UPDATE_PASSWORD = "/users/me/password";
 
-	/* PRODUCT */
+	/* PRODUCTS */
 	public static final String API_PRODUCTS = "/products";
 	public static final String API_PRODUCT_BY_UUID = "/products/{uuid}";
+
+	/* CARTS */
+	public static final String API_CURRENT_USER_CART = "/carts/me";
+	public static final String API_CURRENT_USER_CART_ITEMS = "/carts/me/items";
+	public static final String API_CURRENT_USER_CART_ITEM_BY_UUID = "/carts/me/items/{productUuid}";
 }
