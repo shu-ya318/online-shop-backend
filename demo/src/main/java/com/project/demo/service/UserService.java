@@ -1,8 +1,5 @@
 package com.project.demo.service;
 
-import java.util.Set;
-import java.time.LocalDateTime;
-
 import com.project.demo.dto.user.UserRegisterRequestDTO;
 import com.project.demo.dto.user.UserLoginRequestDTO;
 import com.project.demo.dto.user.UserLoginResponseDTO;
@@ -13,11 +10,18 @@ import com.project.demo.mapper.UserMapper;
 import com.project.demo.enumeration.AccountStatus;
 import com.project.demo.enumeration.AuthProvider;
 import com.project.demo.enumeration.Role;
-
 import com.project.demo.model.User;
 import com.project.demo.repository.UserRepository;
 import com.project.demo.security.JwtUtil;
+import com.project.demo.exception.UserAlreadyExistsException;
+import com.project.demo.exception.InvalidCredentialsException;
+import com.project.demo.exception.UserDeletedException;
+import com.project.demo.exception.InvalidTokenException;
+import com.project.demo.exception.IncorrectPasswordException;
+import com.project.demo.exception.EntityNotFoundException;
 
+import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,6 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -55,7 +60,7 @@ public class UserService {
 
         if (optionalUser.isPresent()) {
             if (!optionalUser.get().isDeleted()) {
-                throw new IllegalArgumentException("Email already registered");
+                throw new UserAlreadyExistsException("Email already registered");
             }
 
             // 軟刪除帳號再註冊：重新啟用帳號
@@ -80,14 +85,14 @@ public class UserService {
     // Login
     public UserLoginResponseDTO login(UserLoginRequestDTO dto) {
         User user = userRepository.findByEmail(dto.email())
-                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
 
         if (user.isDeleted()) {
-            throw new RuntimeException("User is deleted");
+            throw new UserDeletedException("User is deleted");
         }
 
         if (!passwordEncoder.matches(dto.password(), user.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+            throw new InvalidCredentialsException("Invalid email or password");
         }
 
         user.setLastLoginAt(LocalDateTime.now());
@@ -123,14 +128,14 @@ public class UserService {
     public UserLoginResponseDTO exchangeOAuth2Code(String oauth2Code) {
         String redisOAuth2Code = redisService.getOAuth2AuthCode(oauth2Code);
         if (redisOAuth2Code == null) {
-            throw new RuntimeException("oauth2 code not found in redis");
+            throw new InvalidTokenException("oauth2 code not found in redis");
         }
 
         User user = userRepository.findByUuid(UUID.fromString(redisOAuth2Code))
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         if (user.isDeleted()) {
-            throw new RuntimeException("User account is deleted");
+            throw new UserDeletedException("User account is deleted");
         }
 
         var roles = user.getUserRoles().stream().map(Enum::name).collect(Collectors.toSet());
@@ -164,25 +169,25 @@ public class UserService {
         }
 
         if (refreshToken == null) {
-            throw new RuntimeException("Refresh token not found in cookie");
+            throw new InvalidTokenException("Refresh token not found in cookie");
         }
 
         String uuid;
         try {
             uuid = jwtUtil.getUuidFromRefreshToken(refreshToken);
         } catch (Exception e) {
-            throw new RuntimeException("Invalid refresh token format");
+            throw new InvalidTokenException("Invalid refresh token format");
         }
 
         if (!jwtUtil.validateRefreshToken(UUID.fromString(uuid), refreshToken)) {
-            throw new RuntimeException("Invalid or expired refresh token");
+            throw new InvalidTokenException("Invalid or expired refresh token");
         }
 
         User user = userRepository.findByUuid(UUID.fromString(uuid))
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         if (user.isDeleted()) {
-            throw new RuntimeException("User account is deleted");
+            throw new UserDeletedException("User account is deleted");
         }
 
         String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUuid(), user.getEmail(),
@@ -209,13 +214,14 @@ public class UserService {
         return userMapper.toResponseDto(user);
     }
 
+    // Update password
     @Transactional
     public void updatePassword(String email, UserPasswordUpdateRequestDTO dto) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
         if (!passwordEncoder.matches(dto.oldPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Incorrect old password");
+            throw new IncorrectPasswordException("Incorrect old password");
         }
 
         String encodedPassword = passwordEncoder.encode(dto.newPassword());

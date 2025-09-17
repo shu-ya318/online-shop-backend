@@ -1,9 +1,7 @@
 package com.project.demo.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.project.demo.dto.user.OAuth2CodeRequestDTO;
 import com.project.demo.dto.user.UserLoginRequestDTO;
@@ -39,134 +37,59 @@ public class UserController {
      */
 
     @PostMapping(API_REGISTER)
-    public ResponseEntity<?> register(@Valid @RequestBody UserRegisterRequestDTO dto) {
-        try {
-            userService.register(dto);
+    public ResponseEntity<Map<String, String>> register(@Valid @RequestBody UserRegisterRequestDTO dto) {
+        userService.register(dto);
 
-            return ResponseEntity.ok(Map.of("message", "Register successfully!"));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("message", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "An unexpected error occurred. Please try again later!"));
-        }
+        return ResponseEntity.ok(Map.of("message", "Register successfully!"));
     }
 
     @PostMapping(API_LOGIN)
-    public ResponseEntity<?> login(@Valid @RequestBody UserLoginRequestDTO dto) {
-        try {
-            UserLoginResponseDTO response = userService.login(dto);
+    public ResponseEntity<UserLoginResponseDTO> login(@Valid @RequestBody UserLoginRequestDTO dto) {
+        UserLoginResponseDTO response = userService.login(dto);
 
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            if ("User is deleted".equals(e.getMessage())) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(Map.of("message", e.getMessage()));
-            } else {
-                return ResponseEntity.badRequest()
-                        .body(Map.of("message", e.getMessage()));
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "An unexpected error occurred. Please try again later!"));
-        }
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping(API_REFRESH_TOKEN)
-    public ResponseEntity<?> refreshToken() {
-        try {
-            String accessToken = userService.refreshToken();
+    public ResponseEntity<Map<String, String>> refreshToken() {
+        String accessToken = userService.refreshToken();
 
-            return ResponseEntity.ok(Map.of("accessToken", accessToken));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "An unexpected error occurred. Please try again later!"));
-        }
+        return ResponseEntity.ok(Map.of("accessToken", accessToken));
     }
 
     @PostMapping(API_OAUTH2_EXCHANGE_CODE)
-    public ResponseEntity<?> exchangeOAuth2Code(@Valid @RequestBody OAuth2CodeRequestDTO dto) {
-        try {
-            UserLoginResponseDTO response = userService.exchangeOAuth2Code(dto.getOauth2Code());
+    public ResponseEntity<UserLoginResponseDTO> exchangeOAuth2Code(@Valid @RequestBody OAuth2CodeRequestDTO dto) {
+        UserLoginResponseDTO response = userService.exchangeOAuth2Code(dto.getOauth2Code());
 
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            if ("oauth2 code not found in redis".equals(e.getMessage())) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("message", e.getMessage()));
-            } else if ("User not found".equals(e.getMessage())) {
-                return ResponseEntity.notFound()
-                        .build();
-            } else if ("User account is deleted".equals(e.getMessage())) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(Map.of("message", e.getMessage()));
-            } else {
-                return ResponseEntity.badRequest()
-                        .body(Map.of("message", e.getMessage()));
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "An unexpected error occurred. Please try again later!"));
-        }
+        return ResponseEntity.ok(response);
     }
 
     /*
      * GET method
      */
     @GetMapping(API_CURRENT_USER)
-    public ResponseEntity<?> getCurrentUser(Principal principal) {
-        try {
-            UserResponseDTO response = userService.getUserResponseDTOByEmail(principal.getName());
+    public ResponseEntity<UserResponseDTO> getCurrentUser(Principal principal) {
+        UserResponseDTO response = userService.getUserResponseDTOByEmail(principal.getName());
 
-            return ResponseEntity.ok(response);
-        } catch (UsernameNotFoundException e) {
-            return ResponseEntity.notFound()
-                    .build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "An unexpected error occurred. Please try again later!"));
-        }
+        return ResponseEntity.ok(response);
     }
 
     /*
      * PUT
      */
     @PutMapping(API_UPDATE_USER)
-    public ResponseEntity<?> updateUser(Principal principal,
+    public ResponseEntity<UserResponseDTO> updateUser(Principal principal,
             @Valid @RequestBody UserUpdateRequestDTO dto) {
-        try {
-            UserResponseDTO response = userService.updateUser(principal.getName(), dto);
+        UserResponseDTO response = userService.updateUser(principal.getName(), dto);
 
-            return ResponseEntity.ok(response);
-        } catch (UsernameNotFoundException e) {
-            return ResponseEntity.notFound()
-                    .build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "An unexpected error occurred while updating user profile."));
-        }
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping(API_UPDATE_PASSWORD)
-    public ResponseEntity<?> updatePassword(Principal principal,
+    public ResponseEntity<Map<String, String>> updatePassword(Principal principal,
             @Valid @RequestBody UserPasswordUpdateRequestDTO dto) {
-        try {
-            userService.updatePassword(principal.getName(), dto);
+        userService.updatePassword(principal.getName(), dto);
 
-            return ResponseEntity.ok(Map.of("message", "Password updated successfully!"));
-        } catch (UsernameNotFoundException e) {
-            return ResponseEntity.notFound()
-                    .build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "An unexpected error occurred."));
-        }
+        return ResponseEntity.ok(Map.of("message", "Password updated successfully!"));
     }
 }
