@@ -33,4 +33,5 @@ public class PathConstantData {
 
 	/* ORDERS */
 	public static final String API_CURRENT_USER_ORDERS = "/orders/me";
+	public static final String API_CURRENT_USER_ORDER_BY_UUID = "/orders/me/{uuid}";
 }
