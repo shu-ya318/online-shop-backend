@@ -30,4 +30,7 @@ public class PathConstantData {
 	public static final String API_CURRENT_USER_CART = "/carts/me";
 	public static final String API_CURRENT_USER_CART_ITEMS = "/carts/me/items";
 	public static final String API_CURRENT_USER_CART_ITEM_BY_UUID = "/carts/me/items/{productUuid}";
+
+	/* ORDERS */
+	public static final String API_CURRENT_USER_ORDERS = "/orders/me";
 }

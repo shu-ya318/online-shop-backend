@@ -1,13 +1,16 @@
-package com.project.demo.dto.cart;
+package com.project.demo.dto.order;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-public record CartResponseDTO(
-        UUID cartUuid,
+import com.project.demo.enumeration.OrderStatus;
+
+public record OrderResponseDTO(
+        UUID orderUuid,
         UUID userUuid,
-        List<CartItemDTO> items, // 有序性、易用性(便於客戶端把List 序列化成 JSON 陣列)
+        OrderStatus status,
+        List<OrderItemDTO> items,
         BigDecimal subtotal,
         BigDecimal shipping,
         BigDecimal total,

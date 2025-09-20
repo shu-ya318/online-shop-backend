@@ -2,16 +2,20 @@ package com.project.demo.service;
 
 import java.util.List;
 import java.util.UUID;
+import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.project.demo.dto.common.PaginatedResponse;
 import com.project.demo.dto.product.ProductFilterRequestDTO;
 import com.project.demo.dto.product.ProductResponseDTO;
 import com.project.demo.enumeration.AvailabilityStatus;
+import com.project.demo.exception.EntityNotFoundException;
+import com.project.demo.exception.InsufficientStockException;
 import com.project.demo.mapper.ProductMapper;
 import com.project.demo.model.Product;
 import com.project.demo.repository.ProductRepository;
@@ -47,14 +51,39 @@ public class ProductService {
 	// Get product by uuid
 	public ProductResponseDTO getProductByUuid(UUID uuid) {
 		Product product = productRepository.findByUuid(uuid)
-				.orElseThrow(() -> new RuntimeException("Product not found with uuid: " + uuid));
+				.orElseThrow(() -> new EntityNotFoundException("Product not found with uuid: " + uuid));
 
 		ProductResponseDTO dto = productMapper.toProductResponseDTO(product);
 
 		return updateAvailabilityByStock(dto);
 	}
 
-	// Util
+	// Record Sale
+	@Transactional
+	public Product recordSale(UUID productUuid, int quantity) {
+		Product product = productRepository.findByUuid(productUuid)
+				.orElseThrow(() -> new EntityNotFoundException("Product not found with uuid: " + productUuid));
+
+		if (product.getStock() < quantity) {
+			throw new InsufficientStockException("Insufficient stock for product: " + product.getName());
+		}
+
+		int newStock = product.getStock() - quantity;
+		product.setStock(newStock);
+
+		if (newStock == 0) {
+			product.setAvailabilityStatus(AvailabilityStatus.OUT_OF_STOCK);
+		}
+
+		product.setTotalSold(product.getTotalSold() + quantity);
+		product.setUpdatedAt(LocalDateTime.now());
+
+		return product;
+	}
+
+	// ----- Private Helper Method -----
+
+	// Update availability by stock
 	private ProductResponseDTO updateAvailabilityByStock(ProductResponseDTO dto) {
 		boolean shouldUpdateToOutOfStock = dto.stock() != null
 				&& dto.stock() <= 0

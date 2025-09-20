@@ -31,13 +31,13 @@ public interface ProductMapper {
         BigDecimal discountPercentage = product.getDiscountPercentage();
 
         if (discountPercentage == null) {
-            return price;
+            return price.setScale(0, RoundingMode.HALF_UP);
         }
 
         BigDecimal discountMultiplier = discountPercentage.divide(new BigDecimal("100"));
         BigDecimal priceMultiplier = BigDecimal.ONE.subtract(discountMultiplier);
         BigDecimal discountedPrice = price.multiply(priceMultiplier);
 
-        return discountedPrice.setScale(2, RoundingMode.HALF_UP);
+        return discountedPrice.setScale(0, RoundingMode.HALF_UP);
     }
 }

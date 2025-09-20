@@ -1,45 +1,43 @@
 package com.project.demo.mapper;
 
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.project.demo.mapper.util.PriceCalculationUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-import com.project.demo.dto.cart.CartItemDTO;
-import com.project.demo.dto.cart.CartResponseDTO;
-import com.project.demo.model.Cart;
-import com.project.demo.model.CartItem;
+import com.project.demo.dto.order.OrderItemDTO;
+import com.project.demo.dto.order.OrderResponseDTO;
+import com.project.demo.model.Order;
+import com.project.demo.model.OrderItem;
 import com.project.demo.model.Product;
-import com.project.demo.mapper.util.PriceCalculationUtils;
+
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = { ProductMapper.class,
         PriceCalculationUtils.class })
-public interface CartMapper {
+public interface OrderMapper {
 
-    // --------- Cart ---------
-    // 1-1.欄位對應名稱不同
-    @Mapping(target = "cartUuid", source = "uuid")
-    // 1-2.巢狀物件的欄位，只需要取得物件指定欄位
+    // --------- Order ---------
+    @Mapping(target = "orderUuid", source = "uuid")
     @Mapping(target = "userUuid", source = "user.uuid")
-    // 2.複雜的物件集合轉換
-    @Mapping(target = "items", source = "items", qualifiedByName = "toCartItemDTOs")
-    // 3.動態計算的欄位
+    @Mapping(target = "items", source = "items", qualifiedByName = "toOrderItemDTOs")
     @Mapping(target = "subtotal", source = "items", qualifiedByName = "calculateSubtotal")
     @Mapping(target = "shipping", source = "items", qualifiedByName = "calculateShipping")
     @Mapping(target = "total", source = "items", qualifiedByName = "calculateTotal")
     @Mapping(target = "totalQuantity", source = "items", qualifiedByName = "calculateTotalQuantity")
-    CartResponseDTO toCartResponseDTO(Cart cart);
+    OrderResponseDTO toOrderResponseDTO(Order order);
 
-    // --------- CartItem ---------
-    @Named("toCartItemDTOs")
-    default List<CartItemDTO> toCartItemDTOs(Set<CartItem> items) {
+    List<OrderResponseDTO> toOrderResponseDTOs(List<Order> orders);
+
+    // --------- OrderItem ---------
+    @Named("toOrderItemDTOs")
+    default List<OrderItemDTO> toOrderItemDTOs(Set<OrderItem> items) {
         if (items == null)
             return Collections.emptyList();
 
@@ -47,46 +45,46 @@ public interface CartMapper {
 
         return items.stream()
                 .sorted((item1, item2) -> Long.compare(item1.getId(), item2.getId()))
-                .map(item -> toCartItemDTO(item, productMapper))
+                .map(item -> toOrderItemDTO(item, productMapper))
                 .collect(Collectors.toList());
     }
 
-    default CartItemDTO toCartItemDTO(CartItem cartItem, ProductMapper productMapper) {
-        Product product = cartItem.getProduct();
+    default OrderItemDTO toOrderItemDTO(OrderItem orderItem, ProductMapper productMapper) {
+        Product product = orderItem.getProduct();
 
         if (product == null)
             return null;
 
         BigDecimal discountPrice = productMapper.calculateDiscountPrice(product);
 
-        return new CartItemDTO(
+        return new OrderItemDTO(
                 product.getUuid(),
                 product.getName(),
                 product.getPrice(),
                 product.getDiscountPercentage(),
                 discountPrice,
                 product.getImageUrl(),
-                cartItem.getQuantity());
+                orderItem.getQuantity());
     }
 
-    // Utils
+    // --------- Utils ---------
     @Named("calculateSubtotal")
-    default BigDecimal calculateSubtotal(Set<CartItem> items) {
+    default BigDecimal calculateSubtotal(Set<OrderItem> items) {
         return PriceCalculationUtils.calculateSubtotal(items);
     }
 
     @Named("calculateShipping")
-    default BigDecimal calculateShipping(Set<CartItem> items) {
+    default BigDecimal calculateShipping(Set<OrderItem> items) {
         return PriceCalculationUtils.calculateShipping(items);
     }
 
     @Named("calculateTotal")
-    default BigDecimal calculateTotal(Set<CartItem> items) {
+    default BigDecimal calculateTotal(Set<OrderItem> items) {
         return PriceCalculationUtils.calculateTotal(items);
     }
 
     @Named("calculateTotalQuantity")
-    default Integer calculateTotalQuantity(Set<CartItem> items) {
+    default Integer calculateTotalQuantity(Set<OrderItem> items) {
         return PriceCalculationUtils.calculateTotalQuantity(items);
     }
 }

@@ -23,7 +23,7 @@ import lombok.ToString;
 
 @Entity
 @Table(name = "products", indexes = {
-    @Index(name = "idx_product_uuid", columnList = "uuid")
+		@Index(name = "idx_product_uuid", columnList = "uuid")
 })
 @Getter
 @Setter
@@ -53,7 +53,7 @@ public class Product {
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
 
-	@Column(name = "sku", nullable = false, unique = true)
+	@Column(name = "sku", nullable = false, unique = true, updatable = false)
 	private String sku;
 
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)

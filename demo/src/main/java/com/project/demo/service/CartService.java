@@ -114,7 +114,6 @@ public class CartService {
         CartItem cartItem = getCartItemByProductUuid(cart, productUuid);
 
         cart.getItems().remove(cartItem);
-
         cart.setUpdatedAt(LocalDateTime.now());
 
         cartRepository.save(cart);
@@ -122,7 +121,19 @@ public class CartService {
         return cartMapper.toCartResponseDTO(cart);
     }
 
-    // Utils
+    // Clear cart
+    @Transactional
+    public void clearCart(UUID userUuid) {
+        Cart cart = getExistingCartByUserUuid(userUuid);
+
+        cart.getItems().clear();
+        cart.setUpdatedAt(LocalDateTime.now());
+
+        cartRepository.save(cart);
+    }
+
+	// ----- Private Helper Method -----
+
     private Cart createCartForUser(UUID userUuid) {
         User user = userRepository.findByUuid(userUuid)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with uuid: " + userUuid));
