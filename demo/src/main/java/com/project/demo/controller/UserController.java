@@ -59,7 +59,7 @@ public class UserController {
 
     @PostMapping(API_OAUTH2_EXCHANGE_CODE)
     public ResponseEntity<UserLoginResponseDTO> exchangeOAuth2Code(@Valid @RequestBody OAuth2CodeRequestDTO dto) {
-        UserLoginResponseDTO response = userService.exchangeOAuth2Code(dto.getOauth2Code());
+        UserLoginResponseDTO response = userService.exchangeOAuth2Code(dto.oauth2Code());
 
         return ResponseEntity.ok(response);
     }

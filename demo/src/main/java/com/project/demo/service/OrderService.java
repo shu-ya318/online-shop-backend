@@ -19,19 +19,25 @@ import com.project.demo.model.OrderItem;
 import com.project.demo.model.Product;
 import com.project.demo.dto.order.OrderResponseDTO;
 import com.project.demo.enumeration.OrderStatus;
+import com.project.demo.enumeration.PaymentStatus;
 import com.project.demo.exception.EntityNotFoundException;
 import com.project.demo.dto.order.OrderCreateRequestDTO;
 import com.project.demo.repository.OrderRepository;
+import com.project.demo.repository.PaymentRepository;
 import com.project.demo.repository.UserRepository;
 import com.project.demo.mapper.OrderMapper;
+import com.project.demo.mapper.util.PriceCalculationUtils;
 
 import org.springframework.data.domain.Page;
+import org.springframework.scheduling.annotation.Scheduled;
+import com.project.demo.model.Payment;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
     private final CartService cartService;
     private final ProductService productService;
@@ -49,14 +55,16 @@ public class OrderService {
 
         order.setUser(user);
         order.setUuid(UUID.randomUUID());
-        order.setStatus(OrderStatus.PENDING);
+        order.setStatus(OrderStatus.PENDING); // 後續讓PaymentService依不同支付方式來更新訂單狀態
         order.setCreatedAt(LocalDateTime.now());
+        order.setExpiredAt(LocalDateTime.now().plusMinutes(10));
         order.setRecipientName(dto.recipientName());
         order.setRecipientPhoneNumber(dto.recipientPhoneNumber());
         order.setRecipientAddress(dto.recipientAddress());
 
         Set<OrderItem> orderItems = createOrderItems(order, dto);
         order.setItems(orderItems);
+        order.setTotal(PriceCalculationUtils.calculateTotal(orderItems));
 
         Order savedOrder = orderRepository.save(order);
 
@@ -68,7 +76,7 @@ public class OrderService {
     }
 
     // Get all orders by user uuid
-    public PaginatedResponse<OrderResponseDTO> getUserOrders(UUID userUuid, Pageable pageable) {
+    public PaginatedResponse<OrderResponseDTO> getOrders(UUID userUuid, Pageable pageable) {
         Page<Order> orderPage = orderRepository.findByUserUuid(userUuid, pageable);
 
         List<OrderResponseDTO> orderDTOs = orderMapper.toOrderResponseDTOs(orderPage.getContent());
@@ -89,6 +97,42 @@ public class OrderService {
         OrderResponseDTO response = orderMapper.toOrderResponseDTO(order);
 
         return response;
+    }
+
+    // Cancel order by uuid
+    @Transactional
+    public OrderResponseDTO cancelOrderByUuid(UUID orderUuid) {
+        Order order = orderRepository.findByUuid(orderUuid)
+                .orElseThrow(() -> new EntityNotFoundException("Order not found with uuid: " + orderUuid));
+
+        if (order.getStatus() == OrderStatus.PENDING) {
+            order.setStatus(OrderStatus.CANCELLED);
+
+            List<Payment> payments = paymentRepository.findByOrderUuid(orderUuid);
+            payments.forEach(payment -> payment.setStatus(PaymentStatus.CANCELLED));
+            paymentRepository.saveAll(payments);
+
+            productService.releaseStockForOrder(order);
+
+            orderRepository.save(order);
+        }
+
+        OrderResponseDTO response = orderMapper.toOrderResponseDTO(order);
+
+        return response;
+    }
+
+    // Scheduled task to cancel expired orders
+    @Scheduled(cron = "0 * * * * ?")
+    @Transactional
+    public void cancelExpiredOrders() {
+        List<Order> expiredOrders = orderRepository.findByStatusAndExpiredAtLessThan(OrderStatus.PENDING,
+                LocalDateTime.now());
+        for (Order order : expiredOrders) {
+            order.setStatus(OrderStatus.CANCELLED);
+
+            productService.releaseStockForOrder(order);
+        }
     }
 
     // --------- OrderItem ---------

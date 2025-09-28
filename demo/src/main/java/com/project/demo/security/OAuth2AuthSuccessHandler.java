@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -19,8 +20,6 @@ import com.project.demo.model.User;
 import com.project.demo.repository.UserRepository;
 import com.project.demo.service.RedisService;
 
-import static com.project.demo.data.PathConstantData.API_VUE;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,6 +31,9 @@ public class OAuth2AuthSuccessHandler implements AuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
     private final RedisService redisService;
+
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -54,7 +56,7 @@ public class OAuth2AuthSuccessHandler implements AuthenticationSuccessHandler {
         String oauth2Code = UUID.randomUUID().toString();
         redisService.saveOAuth2AuthCode(oauth2Code, user.getUuid().toString(), 5, TimeUnit.MINUTES);
         
-        String redirectUrl = API_VUE + "?oauth2Code=" + oauth2Code;
+        String redirectUrl = frontendUrl + "?oauth2Code=" + oauth2Code;
         response.sendRedirect(redirectUrl);
     }
 

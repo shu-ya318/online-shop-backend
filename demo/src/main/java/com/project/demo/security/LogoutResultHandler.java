@@ -60,8 +60,6 @@ public class LogoutResultHandler implements LogoutSuccessHandler {
             new ObjectMapper().writeValue(response.getWriter(), body);
 
         } catch (Exception e) {
-            System.err.println("Error during logout: " + e.getMessage());
-
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 

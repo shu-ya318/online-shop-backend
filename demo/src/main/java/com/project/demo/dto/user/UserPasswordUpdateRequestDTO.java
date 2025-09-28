@@ -10,6 +10,6 @@ public record UserPasswordUpdateRequestDTO(
 		
 		@NotBlank(message = "Password is required") 
 		@Size(min = 8, max = 20,  message = "Password must be 8-20 characters long") 
-		String newPassword // 未加密
-  ) {
+		String newPassword // 未加密 
+	) {
 }

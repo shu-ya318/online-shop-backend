@@ -12,28 +12,46 @@ import com.project.demo.dto.order.OrderResponseDTO;
 import com.project.demo.model.Order;
 import com.project.demo.model.OrderItem;
 import com.project.demo.model.Product;
+import com.project.demo.model.Payment;
+import com.project.demo.dto.payment.PaymentSummaryDTO;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = { ProductMapper.class,
-        PriceCalculationUtils.class })
+        PriceCalculationUtils.class, PaymentMapper.class })
 public interface OrderMapper {
 
     // --------- Order ---------
     @Mapping(target = "orderUuid", source = "uuid")
     @Mapping(target = "userUuid", source = "user.uuid")
+    @Mapping(target = "total", source = "total")
     @Mapping(target = "items", source = "items", qualifiedByName = "toOrderItemDTOs")
     @Mapping(target = "subtotal", source = "items", qualifiedByName = "calculateSubtotal")
     @Mapping(target = "shipping", source = "items", qualifiedByName = "calculateShipping")
-    @Mapping(target = "total", source = "items", qualifiedByName = "calculateTotal")
     @Mapping(target = "totalQuantity", source = "items", qualifiedByName = "calculateTotalQuantity")
+    @Mapping(target = "payment", source = "payments", qualifiedByName = "toLatestPaymentSummaryDTO")
     OrderResponseDTO toOrderResponseDTO(Order order);
 
     List<OrderResponseDTO> toOrderResponseDTOs(List<Order> orders);
+
+    @Named("toLatestPaymentSummaryDTO")
+    default PaymentSummaryDTO toLatestPaymentSummaryDTO(List<Payment> payments) {
+        if (payments == null || payments.isEmpty()) {
+            return null;
+        }
+
+        PaymentMapper paymentMapper = Mappers.getMapper(PaymentMapper.class);
+
+        return payments.stream()
+                .max(Comparator.comparing(Payment::getCreatedAt))
+                .map(paymentMapper::toPaymentSummaryDTO)
+                .orElse(null);
+    }
 
     // --------- OrderItem ---------
     @Named("toOrderItemDTOs")
@@ -58,33 +76,12 @@ public interface OrderMapper {
         BigDecimal discountPrice = productMapper.calculateDiscountPrice(product);
 
         return new OrderItemDTO(
-                product.getUuid(),
                 product.getName(),
                 product.getPrice(),
                 product.getDiscountPercentage(),
                 discountPrice,
                 product.getImageUrl(),
-                orderItem.getQuantity());
-    }
-
-    // --------- Utils ---------
-    @Named("calculateSubtotal")
-    default BigDecimal calculateSubtotal(Set<OrderItem> items) {
-        return PriceCalculationUtils.calculateSubtotal(items);
-    }
-
-    @Named("calculateShipping")
-    default BigDecimal calculateShipping(Set<OrderItem> items) {
-        return PriceCalculationUtils.calculateShipping(items);
-    }
-
-    @Named("calculateTotal")
-    default BigDecimal calculateTotal(Set<OrderItem> items) {
-        return PriceCalculationUtils.calculateTotal(items);
-    }
-
-    @Named("calculateTotalQuantity")
-    default Integer calculateTotalQuantity(Set<OrderItem> items) {
-        return PriceCalculationUtils.calculateTotalQuantity(items);
+                orderItem.getQuantity(),
+                product.getUuid());
     }
 }

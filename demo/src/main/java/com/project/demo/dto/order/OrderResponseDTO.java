@@ -5,14 +5,18 @@ import java.util.List;
 import java.util.UUID;
 
 import com.project.demo.enumeration.OrderStatus;
+import com.project.demo.dto.payment.PaymentSummaryDTO;
 
 public record OrderResponseDTO(
         UUID orderUuid,
-        UUID userUuid,
         OrderStatus status,
         List<OrderItemDTO> items,
         BigDecimal subtotal,
         BigDecimal shipping,
         BigDecimal total,
-        Integer totalQuantity) {
+        Integer totalQuantity,
+
+        // ===== 關聯 =====
+        UUID userUuid,
+        PaymentSummaryDTO payment) {
 }

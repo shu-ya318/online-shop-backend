@@ -18,6 +18,8 @@ import com.project.demo.exception.EntityNotFoundException;
 import com.project.demo.exception.InsufficientStockException;
 import com.project.demo.mapper.ProductMapper;
 import com.project.demo.model.Product;
+import com.project.demo.model.Order;
+import com.project.demo.model.OrderItem;
 import com.project.demo.repository.ProductRepository;
 import com.project.demo.specification.ProductSpecifications;
 
@@ -79,6 +81,27 @@ public class ProductService {
 		product.setUpdatedAt(LocalDateTime.now());
 
 		return product;
+	}
+
+	// Release Stock
+	@Transactional
+	public void releaseStockForOrder(Order order) {
+		for (OrderItem item : order.getItems()) {
+			Product product = item.getProduct();
+			int quantity = item.getQuantity();
+
+			int newStock = product.getStock() + quantity;
+			product.setStock(newStock);
+
+			if (newStock > 0 && product.getAvailabilityStatus() == AvailabilityStatus.OUT_OF_STOCK) {
+				product.setAvailabilityStatus(AvailabilityStatus.IN_STOCK);
+			}
+
+			product.setTotalSold(product.getTotalSold() - quantity);
+			product.setUpdatedAt(LocalDateTime.now());
+			
+			productRepository.save(product);
+		}
 	}
 
 	// ----- Private Helper Method -----

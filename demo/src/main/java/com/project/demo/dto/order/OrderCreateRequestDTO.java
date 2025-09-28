@@ -11,6 +11,5 @@ public record OrderCreateRequestDTO(
         @NotNull String recipientPhoneNumber,
         @NotNull String recipientAddress,
         @NotNull @NotEmpty(message = "Order items cannot be empty!") @Valid List<OrderItemCreateRequestDTO> items,
-        String orderNotes
-        ) {
+        String orderNotes) {
 }

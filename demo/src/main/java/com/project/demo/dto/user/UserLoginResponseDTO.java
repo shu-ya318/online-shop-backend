@@ -6,6 +6,5 @@ package com.project.demo.dto.user;
 // import com.project.demo.enumeration.Role;
 
 public record UserLoginResponseDTO (
-    String accessToken
-) {
+    String accessToken) {
 }

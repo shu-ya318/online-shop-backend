@@ -10,8 +10,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.CascadeType;
 import java.util.Set;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -58,6 +61,9 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<OrderItem> items = new HashSet<>();
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Payment> payments = new ArrayList<>();
+
     // ===== 收件人資訊 =====
     @Column(name = "recipient_name", nullable = false)
     private String recipientName;
@@ -72,10 +78,17 @@ public class Order {
     @Column(name = "order_notes")
     private String orderNotes;
 
+    // ===== 金額資訊 =====
+    @Column(name = "total", nullable = false, precision = 10, scale = 0)
+    private BigDecimal total;
+
     // ===== 審計欄位 =====
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "expired_at")
+    private LocalDateTime expiredAt;
 }

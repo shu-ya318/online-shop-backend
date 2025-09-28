@@ -60,33 +60,12 @@ public interface CartMapper {
         BigDecimal discountPrice = productMapper.calculateDiscountPrice(product);
 
         return new CartItemDTO(
-                product.getUuid(),
                 product.getName(),
                 product.getPrice(),
                 product.getDiscountPercentage(),
                 discountPrice,
                 product.getImageUrl(),
-                cartItem.getQuantity());
-    }
-
-    // Utils
-    @Named("calculateSubtotal")
-    default BigDecimal calculateSubtotal(Set<CartItem> items) {
-        return PriceCalculationUtils.calculateSubtotal(items);
-    }
-
-    @Named("calculateShipping")
-    default BigDecimal calculateShipping(Set<CartItem> items) {
-        return PriceCalculationUtils.calculateShipping(items);
-    }
-
-    @Named("calculateTotal")
-    default BigDecimal calculateTotal(Set<CartItem> items) {
-        return PriceCalculationUtils.calculateTotal(items);
-    }
-
-    @Named("calculateTotalQuantity")
-    default Integer calculateTotalQuantity(Set<CartItem> items) {
-        return PriceCalculationUtils.calculateTotalQuantity(items);
+                cartItem.getQuantity(),
+                product.getUuid());
     }
 }
