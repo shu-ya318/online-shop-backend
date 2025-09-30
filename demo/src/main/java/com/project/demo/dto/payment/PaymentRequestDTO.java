@@ -7,8 +7,10 @@ import com.project.demo.enumeration.PaymentMethod;
 import jakarta.validation.constraints.NotNull;
 
 public record PaymentRequestDTO(
-        @NotNull PaymentMethod method,
+        @NotNull(message = "Payment method is required!")
+        PaymentMethod method,
         
         // ===== 關聯 =====
-        @NotNull UUID orderUuid) {
+        @NotNull(message = "Order UUID is required!")
+        UUID orderUuid) {
 }

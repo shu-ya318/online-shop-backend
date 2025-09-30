@@ -104,22 +104,25 @@ public class UserService {
 
         // 處理 Token，提供給客戶端
         var roles = user.getUserRoles().stream().map(Enum::name).collect(Collectors.toSet());
+
         String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUuid(), user.getEmail(),
                 roles);
-
         String refreshToken = jwtUtil.generateRefreshToken(user.getUuid());
 
         redisService.saveRefreshToken(user.getUuid().toString(), refreshToken, jwtUtil.getRefreshTokenExpiration(),
                 java.util.concurrent.TimeUnit.MILLISECONDS);
 
         Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+
         refreshCookie.setHttpOnly(true);
         refreshCookie.setSecure(true);
         refreshCookie.setPath("/");
         refreshCookie.setMaxAge((int) jwtUtil.getRefreshTokenExpiration() / 1000);
+
         response.addCookie(refreshCookie);
 
         UserLoginResponseDTO loginResponse = userMapper.toUserLoginResponseDTO(accessToken);
+
         return loginResponse;
     }
 
@@ -127,6 +130,7 @@ public class UserService {
     @Transactional
     public UserLoginResponseDTO exchangeOAuth2Code(String oauth2Code) {
         String redisOAuth2Code = redisService.getOAuth2AuthCode(oauth2Code);
+
         if (redisOAuth2Code == null) {
             throw new InvalidTokenException("oauth2 code not found in redis");
         }
@@ -139,6 +143,7 @@ public class UserService {
         }
 
         var roles = user.getUserRoles().stream().map(Enum::name).collect(Collectors.toSet());
+
         String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUuid(), user.getEmail(), roles);
         String refreshToken = jwtUtil.generateRefreshToken(user.getUuid());
 
@@ -146,10 +151,12 @@ public class UserService {
                 java.util.concurrent.TimeUnit.MILLISECONDS);
 
         Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+
         refreshCookie.setHttpOnly(true);
         refreshCookie.setSecure(true);
         refreshCookie.setPath("/");
         refreshCookie.setMaxAge((int) jwtUtil.getRefreshTokenExpiration() / 1000);
+
         response.addCookie(refreshCookie);
 
         return userMapper.toUserLoginResponseDTO(accessToken);
@@ -173,6 +180,7 @@ public class UserService {
         }
 
         String uuid;
+
         try {
             uuid = jwtUtil.getUuidFromRefreshToken(refreshToken);
         } catch (Exception e) {
@@ -192,6 +200,7 @@ public class UserService {
 
         String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUuid(), user.getEmail(),
                 user.getUserRoles().stream().map(Enum::name).collect(Collectors.toSet()));
+
         return accessToken;
     }
 
@@ -208,6 +217,7 @@ public class UserService {
     public UserResponseDTO updateUser(String email, UserUpdateRequestDTO dto) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+
         userMapper.updateUserFromUserUpdateRequestDTO(dto, user);
         userRepository.save(user);
 
@@ -225,7 +235,9 @@ public class UserService {
         }
 
         String encodedPassword = passwordEncoder.encode(dto.newPassword());
+
         user.setPassword(encodedPassword);
+
         userRepository.save(user);
     }
 }
