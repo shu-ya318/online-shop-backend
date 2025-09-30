@@ -13,6 +13,7 @@ public interface PaymentMapper {
 
     @Mapping(source = "order.uuid", target = "orderUuid")
     @Mapping(target = "redirectUrl", expression = "java(null)")
+    @Mapping(target = "transactionId", expression = "java(payment.getTransactionId() == null ? \"\" : payment.getTransactionId())")
     PaymentResponseDTO toPaymentResponseDTO(Payment payment);
 
     PaymentSummaryDTO toPaymentSummaryDTO(Payment payment);

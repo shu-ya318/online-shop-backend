@@ -115,9 +115,9 @@ public class PayPalGateway implements PaymentGateway {
             if ("approved".equalsIgnoreCase(executedPayment.getState())) {
                 String transactionId = executedPayment.getTransactions().get(0).getRelatedResources().get(0).getSale()
                         .getId();
-                return new PaymentGatewayResponseDTO(transactionId, PaymentStatus.SUCCESS, null);
+                return new PaymentGatewayResponseDTO(transactionId, PaymentStatus.SUCCESS, "");
             } else {
-                return new PaymentGatewayResponseDTO(requestDTO.paymentId(), PaymentStatus.FAILED, null);
+                return new PaymentGatewayResponseDTO(requestDTO.paymentId(), PaymentStatus.FAILED, "");
             }
         } catch (PayPalRESTException e) {
             throw new PaymentGatewayException("Failed to execute PayPal payment", e);

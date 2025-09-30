@@ -58,13 +58,16 @@ public interface CartMapper {
             return null;
 
         BigDecimal discountPrice = productMapper.calculateDiscountPrice(product);
+        String imageUrl = product.getImageUrl() == null ? "" : product.getImageUrl();
+        BigDecimal discountPercentage = product.getDiscountPercentage() == null ? BigDecimal.ZERO
+                : product.getDiscountPercentage();
 
         return new CartItemDTO(
                 product.getName(),
                 product.getPrice(),
-                product.getDiscountPercentage(),
+                discountPercentage,
                 discountPrice,
-                product.getImageUrl(),
+                imageUrl,
                 cartItem.getQuantity(),
                 product.getUuid());
     }

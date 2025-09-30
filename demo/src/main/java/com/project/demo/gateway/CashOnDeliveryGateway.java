@@ -17,12 +17,12 @@ public class CashOnDeliveryGateway implements PaymentGateway {
     public PaymentGatewayResponseDTO createPayment(Payment payment) {
         String transactionId = "cod-" + UUID.randomUUID().toString();
         
-        return new PaymentGatewayResponseDTO(transactionId, PaymentStatus.PAY_ON_DELIVERY, null);
+        return new PaymentGatewayResponseDTO(transactionId, PaymentStatus.PAY_ON_DELIVERY, "");
     }
 
     @Override
     public PaymentGatewayResponseDTO capturePayment(PaymentGatewayRequestDTO requestDTO) {
-        return new PaymentGatewayResponseDTO(requestDTO.paymentId(), PaymentStatus.SUCCESS, null);
+        return new PaymentGatewayResponseDTO(requestDTO.paymentId(), PaymentStatus.SUCCESS, "");
     }
 
     @Override

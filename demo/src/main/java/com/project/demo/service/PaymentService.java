@@ -64,9 +64,8 @@ public class PaymentService {
 
                 paymentRepository.save(payment);
 
-                // TODO: 移除，改由capturePayment來更新訂單狀態
-                if (payment.getStatus() == PaymentStatus.PAY_ON_DELIVERY
-                                || payment.getStatus() == PaymentStatus.SUCCESS) {
+                // 對於貨到付款，直接更新訂單狀態（不需要外部確認）
+                if (payment.getStatus() == PaymentStatus.PAY_ON_DELIVERY) {
                         order.setStatus(OrderStatus.PROCESSING);
                         order.setUpdatedAt(LocalDateTime.now());
 
@@ -111,13 +110,14 @@ public class PaymentService {
                                         "Order not found for payment transactionId: " + dto.paymentId());
                 }
 
-                if (gatewayResponse.status() == PaymentStatus.SUCCESS
-                                || gatewayResponse.status() == PaymentStatus.PAY_ON_DELIVERY) {
+                // 對於外部支付平台，依最終支付結果更新訂單狀態
+                if (gatewayResponse.status() == PaymentStatus.SUCCESS) {
                         order.setStatus(OrderStatus.PROCESSING);
                         order.setUpdatedAt(LocalDateTime.now());
 
                         orderRepository.save(order);
                 } else {
+                        // 支付失敗或取消，取消訂單
                         orderService.cancelOrderByUuid(order.getUuid());
                 }
 

@@ -74,13 +74,16 @@ public interface OrderMapper {
             return null;
 
         BigDecimal discountPrice = productMapper.calculateDiscountPrice(product);
+        String imageUrl = product.getImageUrl() == null ? "" : product.getImageUrl();
+        BigDecimal discountPercentage = product.getDiscountPercentage() == null ? BigDecimal.ZERO
+                : product.getDiscountPercentage();
 
         return new OrderItemDTO(
                 product.getName(),
                 product.getPrice(),
-                product.getDiscountPercentage(),
+                discountPercentage,
                 discountPrice,
-                product.getImageUrl(),
+                imageUrl,
                 orderItem.getQuantity(),
                 product.getUuid());
     }

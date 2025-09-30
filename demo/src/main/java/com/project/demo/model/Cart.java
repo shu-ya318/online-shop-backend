@@ -45,6 +45,7 @@ public class Cart {
     @JoinColumn(name = "user_uuid", referencedColumnName = "uuid", nullable = false, unique = true)
     private User user;
 
+    // TODOl: 是否加上nullable = false
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<CartItem> items = new HashSet<>(); // 唯一性(避免重複CartItem)、無序性
 
