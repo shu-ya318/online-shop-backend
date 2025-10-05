@@ -11,7 +11,7 @@ import com.project.demo.model.Payment;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PaymentMapper {
 
-    @Mapping(source = "order.uuid", target = "orderUuid")
+    @Mapping(target = "orderUuid", source = "order.uuid")
     @Mapping(target = "redirectUrl", expression = "java(null)")
     @Mapping(target = "transactionId", expression = "java(payment.getTransactionId() == null ? \"\" : payment.getTransactionId())")
     PaymentResponseDTO toPaymentResponseDTO(Payment payment);

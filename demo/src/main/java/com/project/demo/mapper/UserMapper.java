@@ -23,8 +23,8 @@ public interface UserMapper {
 	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 	void updateUserFromUserUpdateRequestDTO(UserUpdateRequestDTO dto, @MappingTarget User user);
 
-	@Mapping(target = "phoneNumber", expression = "java(user.getPhoneNumber() == null ? \"\" : user.getPhoneNumber())")
-	@Mapping(target = "address", expression = "java(user.getAddress() == null ? \"\" : user.getAddress())")
-	@Mapping(target = "birth", expression = "java(user.getBirth() == null ? \"\" : user.getBirth().toString())")
+	@Mapping(source = "phoneNumber", target = "phoneNumber", defaultExpression = "java(\"\")")
+	@Mapping(source = "address", target = "address", defaultExpression = "java(\"\")")
+	@Mapping(source = "birth", target = "birth", defaultExpression = "java(\"\")")
 	UserResponseDTO toResponseDto(User user);
 }

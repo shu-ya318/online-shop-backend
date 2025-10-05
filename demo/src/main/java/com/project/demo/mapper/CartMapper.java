@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
 import com.project.demo.dto.cart.CartItemDTO;
@@ -19,8 +18,7 @@ import com.project.demo.model.CartItem;
 import com.project.demo.model.Product;
 import com.project.demo.mapper.util.PriceCalculationUtils;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = { ProductMapper.class,
-        PriceCalculationUtils.class })
+@Mapper(componentModel = "spring", uses = { PriceCalculationUtils.class, ProductMapper.class })
 public interface CartMapper {
 
     // --------- Cart ---------

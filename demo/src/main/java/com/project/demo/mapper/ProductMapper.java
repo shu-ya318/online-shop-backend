@@ -17,7 +17,7 @@ public interface ProductMapper {
 
     List<ProductResponseDTO> toResponseDTOs(List<Product> products);
 
-    @Mapping(target = "discountPrice", source = "product", qualifiedByName = "calculateDiscountPrice")
+    @Mapping(target = "discountPrice", expression = "java(calculateDiscountPrice(product))")
     @Mapping(target = "imageUrl", expression = "java(product.getImageUrl() == null ? \"\" : product.getImageUrl())")
     @Mapping(target = "discountPercentage", expression = "java(product.getDiscountPercentage() == null ? java.math.BigDecimal.ZERO : product.getDiscountPercentage())")
     ProductResponseDTO toProductResponseDTO(Product product);

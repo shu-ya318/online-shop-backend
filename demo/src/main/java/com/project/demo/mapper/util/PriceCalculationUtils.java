@@ -12,19 +12,10 @@ import java.util.Set;
 
 public class PriceCalculationUtils {
 
-    @Named("calculateTotalQuantity")
-    public static <T extends Sellable> Integer calculateTotalQuantity(Set<T> items) {
-        if (items == null) {
-            return 0;
-        }
-
-        return items.stream()
-                .mapToInt(Sellable::getQuantity)
-                .sum();
-    }
+    private static final BigDecimal SHIPPING_FEE = new BigDecimal("60");
 
     @Named("calculateSubtotal")
-    public static <T extends Sellable> BigDecimal calculateSubtotal(Set<T> items) {
+    public static BigDecimal calculateSubtotal(Set<? extends Sellable> items) {
         if (items == null || items.isEmpty()) {
             return BigDecimal.ZERO.setScale(0, RoundingMode.HALF_UP);
         }
@@ -41,21 +32,32 @@ public class PriceCalculationUtils {
     }
 
     @Named("calculateShipping")
-    public static <T extends Sellable> BigDecimal calculateShipping(Set<T> items) {
+    public static BigDecimal calculateShipping(Set<? extends Sellable> items) {
         BigDecimal subtotal = calculateSubtotal(items);
 
         if (subtotal.compareTo(new BigDecimal("300")) >= 0) {
             return BigDecimal.ZERO.setScale(0, RoundingMode.HALF_UP);
         } else {
-            return new BigDecimal("60").setScale(0, RoundingMode.HALF_UP);
+            return SHIPPING_FEE;
         }
     }
 
     @Named("calculateTotal")
-    public static <T extends Sellable> BigDecimal calculateTotal(Set<T> items) {
+    public static BigDecimal calculateTotal(Set<? extends Sellable> items) {
         BigDecimal subtotal = calculateSubtotal(items);
         BigDecimal shipping = calculateShipping(items);
 
         return subtotal.add(shipping).setScale(0, RoundingMode.HALF_UP);
+    }
+
+    @Named("calculateTotalQuantity")
+    public static Integer calculateTotalQuantity(Set<? extends Sellable> items) {
+        if (items == null) {
+            return 0;
+        }
+
+        return items.stream()
+                .mapToInt(Sellable::getQuantity)
+                .sum();
     }
 }
