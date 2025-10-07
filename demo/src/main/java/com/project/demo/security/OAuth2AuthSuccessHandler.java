@@ -38,26 +38,31 @@ public class OAuth2AuthSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
             Authentication authentication) throws IOException, ServletException {
-        DefaultOAuth2User oauth2User = (DefaultOAuth2User) authentication.getPrincipal();
-        String email = oauth2User.getAttribute("email");
 
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        User user;
+            DefaultOAuth2User oauth2User = (DefaultOAuth2User) authentication.getPrincipal();
 
-        if (userOptional.isPresent()) {
-            user = userOptional.get();
-            updateLoginInfo(user, request);
-        } else {
-            user = createNewOAuth2User(oauth2User, request);
-        }
+            String email = oauth2User.getAttribute("email");
 
-        userRepository.save(user);
+            Optional<User> userOptional = userRepository.findByEmail(email);
+            User user;
 
-        String oauth2Code = UUID.randomUUID().toString();
-        redisService.saveOAuth2AuthCode(oauth2Code, user.getUuid().toString(), 5, TimeUnit.MINUTES);
-        
-        String redirectUrl = frontendUrl + "?oauth2Code=" + oauth2Code;
-        response.sendRedirect(redirectUrl);
+            if (userOptional.isPresent()) {
+                user = userOptional.get();
+                user.setAuthProvider(AuthProvider.GOOGLE);
+                user.setName(oauth2User.getAttribute("name"));
+
+                updateLoginInfo(user, request);
+            } else {
+                user = createNewOAuth2User(oauth2User, request);
+            }
+
+            userRepository.save(user);
+
+            String oauth2Code = UUID.randomUUID().toString();
+            redisService.saveOAuth2AuthCode(oauth2Code, user.getUuid().toString(), 5, TimeUnit.MINUTES);
+
+            String redirectUrl = frontendUrl + "?oauth2Code=" + oauth2Code;
+            response.sendRedirect(redirectUrl);
     }
 
     private User createNewOAuth2User(DefaultOAuth2User oauth2User, HttpServletRequest request) {

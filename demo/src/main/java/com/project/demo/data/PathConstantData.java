@@ -1,15 +1,18 @@
 package com.project.demo.data;
 
 public class PathConstantData {
-	/* LOCAL & PORT */
-	public static final String API_SPRING = "http://localhost:8081";
 
 	/* DNS */
-	public static final String API_DNS = "https://real-domain.com";
+	public static final String API_DNS = "http://localhost:8080";
 
 	/* PUBLIC */
 	public static final String API_PUBLIC = "/public";
-	public static final String API_PUBLIC_ALL = "/public/**";
+	public static final String[] API_PUBLIC_ALL = new String[] {
+			"/v3/api-docs/**",
+			"/swagger-ui/**",
+			"/oauth2/**",
+			"/public/**"
+	};
 
 	/* USERS */
 	public static final String API_REGISTER = "/public/users/register";
