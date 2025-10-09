@@ -112,9 +112,7 @@ demo/
 │   └── templates/
 ├── src/test/java/com/project/demo/
 │   └── DemoApplicationTests.java
-├── Dockerfile
-├── pom.xml
-└── README.md
+└── pom.xml
 ```
 
 ## **Quick Start**
@@ -133,7 +131,7 @@ demo/
 
    ```bash
    git clone https://github.com/shu-ya318/online-shop-backend.git
-   cd online-shop-backend/demo
+   cd online-shop-backend
    ```
 
 2. **Configure Environment Variables**
@@ -143,21 +141,29 @@ demo/
    **Windows:**
 
    ```bash
-   mvnw.cmd spring-boot:run
+   .\\demo\\mvnw.cmd spring-boot:run
    ```
 
    **Unix/Linux/macOS:**
 
    ```bash
-   ./mvnw spring-boot:run
+   ./demo/mvnw spring-boot:run
    ```
 
 ## **Development Guide**
 
 ### Building the Project
 
+**Windows:**
+
 ```bash
-mvn clean package 
+.\\demo\\mvnw.cmd clean package
+```
+
+**Unix/Linux/macOS:**
+
+```bash
+./demo/mvnw clean package
 ```
 
 ## **Docker Deployment**
