@@ -1,4 +1,4 @@
-# ===== Stage 1: install JDK 17 =====
+# ===== Stage 1: install JDK 17 (online) =====
 FROM ubuntu:22.04 AS jdk17
 
 LABEL stage="jdk17"
@@ -11,7 +11,7 @@ RUN apt-get update && \
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV PATH=$JAVA_HOME/bin:$PATH
 
-# ===== Stage 2: install Tomcat =====
+# ===== Stage 2: install Tomcat (offline) =====
 FROM ubuntu:22.04 AS tomcat
 
 LABEL stage="tomcat"
@@ -31,7 +31,7 @@ FROM ubuntu:22.04
 
 LABEL maintainer="ShuYaHsieh <shuyahsieh318@gmail.com>" \
       version="1.0.0" \
-      description="Spring Boot WAR deployment with Tomcat 10 & JDK17 (Online)"
+      description="Spring Boot WAR deployment with Tomcat 10 (offline) & JDK17 (Online)"
 
 # install JDK
 RUN apt-get update && \
@@ -42,7 +42,7 @@ RUN apt-get update && \
 COPY --from=tomcat /usr/local/tomcat /usr/local/tomcat
 
 # copy Spring Boot WAR, built by Maven
-COPY target/onlineShop.war /usr/local/tomcat/webapps/onlineShop.war
+COPY demo/target/onlineShop.war /usr/local/tomcat/webapps/onlineShop.war
 
 ENV SPRING_PROFILES_ACTIVE=docker
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
