@@ -3,6 +3,8 @@ package com.project.demo.service;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,9 +29,6 @@ import com.project.demo.repository.PaymentRepository;
 import com.project.demo.repository.UserRepository;
 import com.project.demo.mapper.OrderMapper;
 import com.project.demo.mapper.util.PriceCalculationUtils;
-
-import org.springframework.data.domain.Page;
-import org.springframework.scheduling.annotation.Scheduled;
 import com.project.demo.model.Payment;
 
 @Service
@@ -55,7 +54,7 @@ public class OrderService {
 
         order.setUser(user);
         order.setUuid(UUID.randomUUID());
-        order.setStatus(OrderStatus.PENDING); // 後續讓PaymentService依不同支付方式來更新訂單狀態
+        order.setStatus(OrderStatus.PENDING);
         order.setCreatedAt(LocalDateTime.now());
         order.setExpiredAt(LocalDateTime.now().plusMinutes(10));
         order.setRecipientName(dto.recipientName());
@@ -64,6 +63,7 @@ public class OrderService {
 
         Set<OrderItem> orderItems = createOrderItems(order, dto);
         order.setItems(orderItems);
+
         order.setTotal(PriceCalculationUtils.calculateTotal(orderItems));
 
         Order savedOrder = orderRepository.save(order);
@@ -138,7 +138,7 @@ public class OrderService {
     // --------- OrderItem ---------
 
     private Set<OrderItem> createOrderItems(Order order, OrderCreateRequestDTO dto) {
-        Set<OrderItem> orderItems = new HashSet<>();
+       Set<OrderItem> orderItems = new HashSet<>();
 
         dto.items().forEach(item -> {
             Product product = productService.recordSale(item.productUuid(), item.quantity());

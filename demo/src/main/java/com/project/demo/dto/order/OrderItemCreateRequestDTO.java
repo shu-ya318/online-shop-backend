@@ -12,8 +12,5 @@ public record OrderItemCreateRequestDTO(
         
         // ===== 關聯 =====
         @NotNull 
-        UUID productUuid,
-
-        @NotNull 
-        UUID userUuid) {
+        UUID productUuid) {
 }

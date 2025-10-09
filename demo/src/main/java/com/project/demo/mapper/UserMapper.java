@@ -25,6 +25,6 @@ public interface UserMapper {
 
 	@Mapping(source = "phoneNumber", target = "phoneNumber", defaultExpression = "java(\"\")")
 	@Mapping(source = "address", target = "address", defaultExpression = "java(\"\")")
-	@Mapping(source = "birth", target = "birth", defaultExpression = "java(\"\")")
+	@Mapping(source = "birth", target = "birth", defaultExpression = "java(\"1900-01-01\")")
 	UserResponseDTO toResponseDto(User user);
 }

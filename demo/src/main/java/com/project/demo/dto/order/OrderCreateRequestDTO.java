@@ -2,9 +2,12 @@ package com.project.demo.dto.order;
 
 import java.util.List;
 
+import com.project.demo.enumeration.PaymentMethod;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record OrderCreateRequestDTO(
@@ -22,6 +25,8 @@ public record OrderCreateRequestDTO(
         @Valid
         List<OrderItemCreateRequestDTO> items,
         
+        String orderNotes,
         
-        String orderNotes) {
+        @NotNull(message = "Payment method is required!")
+        PaymentMethod paymentMethod) {
 }
