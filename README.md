@@ -1,131 +1,33 @@
 # Online Shop Backend
 
-A comprehensive e-commerce backend system built with Spring Boot 3.3.0, providing user management, product catalog, shopping cart, order processing, and payment functionality.
+This is a modern e-commerce backend built with Spring Boot 3.3.0, providing user management, product catalog, shopping cart, order processing, and payment functionality.
 
-## **Technology Stack**
+## Technology Stack
 
 - **Framework**: Spring Boot 3.3.0
 - **Java**: JDK 17
 - **Database**: Microsoft SQL Server
 - **Cache**: Redis
 - **Security**: Spring Security + JWT + OAuth2 (Google)
-- **Mapping**: MapStruct
-- **Payment**: PayPal SDK
-- **Build**: Maven
-- **Containerization**: Docker + Tomcat
+- **Mapping**: MapStruct 1.5.5.Final
+- **Payment**: PayPal SDK 1.14.0
+- **Build**: Maven 3.9.6
+- **Containerization**: Docker + Tomcat 10.1.46
 
-## **Project Structure**
+## Database Schema
+![Schema](docs/schema.png)
 
-```
-demo/
-├── src/main/java/com/project/demo/
-│   ├── config/
-│   │   ├── ApplicationConfig.java
-│   │   ├── SecurityConfig.java
-│   │   └── WebConfig.java
-│   ├── controller/
-│   │   ├── CartController.java
-│   │   ├── OrderController.java
-│   │   ├── PaymentController.java
-│   │   ├── ProductController.java
-│   │   └── UserController.java
-│   ├── converter/
-│   │   ├── StringToCategoryConverter.java
-│   │   └── StringToSortDirectionConverter.java
-│   ├── data/
-│   │   └── PathConstantData.java
-│   ├── dto/
-│   │   ├── cart/
-│   │   ├── common/
-│   │   ├── gateway/
-│   │   ├── order/
-│   │   ├── payment/
-│   │   ├── product/
-│   │   └── user/
-│   ├── enumeration/
-│   │   ├── AccountStatus.java
-│   │   ├── AuthProvider.java
-│   │   ├── AvailabilityStatus.java
-│   │   ├── Category.java
-│   │   ├── OrderStatus.java
-│   │   ├── PaymentMethod.java
-│   │   ├── PaymentStatus.java
-│   │   └── Role.java
-│   ├── exception/
-│   │   ├── EntityNotFoundException.java
-│   │   ├── GlobalExceptionHandler.java
-│   │   ├── IncorrectPasswordException.java
-│   │   ├── InsufficientStockException.java
-│   │   ├── InvalidCredentialsException.java
-│   │   ├── InvalidPaymentException.java
-│   │   ├── InvalidTokenException.java
-│   │   ├── OperationNotSupportedException.java
-│   │   ├── PaymentGatewayException.java
-│   │   ├── UserAlreadyExistsException.java
-│   │   └── UserDeletedException.java
-│   ├── gateway/
-│   │   ├── CashOnDeliveryGateway.java
-│   │   ├── PaymentGateway.java
-│   │   ├── PaymentGatewayFactory.java
-│   │   └── PayPalGateway.java
-│   ├── mapper/
-│   │   ├── util/
-│   │   │   └── PriceCalculationUtils.java
-│   │   ├── CartMapper.java
-│   │   ├── OrderMapper.java
-│   │   ├── PaymentMapper.java
-│   │   ├── ProductMapper.java
-│   │   └── UserMapper.java
-│   ├── model/
-│   │   ├── Cart.java
-│   │   ├── CartItem.java
-│   │   ├── Order.java
-│   │   ├── OrderItem.java
-│   │   ├── Payment.java
-│   │   ├── Product.java
-│   │   ├── Sellable.java
-│   │   └── User.java
-│   ├── repository/
-│   │   ├── CartRepository.java
-│   │   ├── OrderRepository.java
-│   │   ├── PaymentRepository.java
-│   │   ├── ProductRepository.java
-│   │   └── UserRepository.java
-│   ├── security/
-│   │   ├── JwtFilter.java
-│   │   ├── JwtUtil.java
-│   │   ├── LogoutResultHandler.java
-│   │   └── OAuth2AuthSuccessHandler.java
-│   ├── service/
-│   │   ├── CartService.java
-│   │   ├── OrderService.java
-│   │   ├── PaymentService.java
-│   │   ├── ProductService.java
-│   │   ├── RedisService.java
-│   │   └── UserService.java
-│   ├── specification/
-│   │   └── ProductSpecifications.java
-│   └── DemoApplication.java
-├── src/main/resources/
-│   ├── application.properties
-│   ├── static/
-│   └── templates/
-├── src/test/java/com/project/demo/
-│   └── DemoApplicationTests.java
-└── pom.xml
-```
-
-## **Quick Start**
+## Getting Start
 
 ### Prerequisites
 
 - JDK 17+
-- Maven 3.9+
+- Maven 3.9.6+
 - Microsoft SQL Server
 - Redis
 - Docker (optional)
 
-### Installation Steps
+### Installation
 
 1. **Clone the Repository**
 
@@ -135,24 +37,30 @@ demo/
    ```
 
 2. **Configure Environment Variables**
+   
+   The main configuration file is `src/main/resources/application.properties`. By default, it uses the `local` profile (`spring.profiles.active=local`).
+   
+   For local development, you can create an `application-local.properties` file in the same directory to override default settings (e.g., database credentials, JWT secret).
+   
+   For Docker deployment, create an `application-docker.properties` file.
 
-3. **Run the Application**
+### Development
 
-   **Windows:**
+Start the development server:
 
-   ```bash
-   .\\demo\\mvnw.cmd spring-boot:run
-   ```
+**Windows:**
 
-   **Unix/Linux/macOS:**
+```bash
+.\\demo\\mvnw.cmd spring-boot:run
+```
 
-   ```bash
-   ./demo/mvnw spring-boot:run
-   ```
+**Unix/Linux/macOS:**
 
-## **Development Guide**
+```bash
+./demo/mvnw spring-boot:run
+```
 
-### Building the Project
+### Building
 
 **Windows:**
 
@@ -166,21 +74,49 @@ demo/
 ./demo/mvnw clean package
 ```
 
-## **Docker Deployment**
+### Containerization (Docker)
 
-### Building Docker Image
+This project is designed to be managed and deployed using Docker Compose from a parent directory. Please refer to the `docker-compose.yml` file in the parent directory for instructions on building and running the services.
 
-```bash
-docker build -t online-shop-backend:latest .
+## Project Structure
+
+```
+online-shop-backend/
+├── .gitignore
+├── Dockerfile
+├── README.md
+├── apache-tomcat-10.1.46.tar.gz
+└── demo/
+    ├── .mvn/
+    ├── src/
+    │   ├── main/
+    │   │   ├── java/com/project/demo/
+    │   │   │   ├── config/
+    │   │   │   ├── controller/
+    │   │   │   ├── converter/
+    │   │   │   ├── data/
+    │   │   │   ├── dto/
+    │   │   │   ├── enumeration/
+    │   │   │   ├── exception/
+    │   │   │   ├── gateway/
+    │   │   │   ├── mapper/
+    │   │   │   ├── model/
+    │   │   │   ├── repository/
+    │   │   │   ├── security/
+    │   │   │   ├── service/
+    │   │   │   ├── specification/
+    │   │   │   └── DemoApplication.java
+    │   │   └── resources/
+    │   │       ├── application-docker.properties
+    │   │       ├── application-local.properties
+    │   │       ├── application.properties
+    │   └── test/
+    ├── mvnw
+    ├── mvnw.cmd
+    └── pom.xml
 ```
 
-### Running Container
-
-```bash
-docker run -d -p 8080:8080 --name online-shop-backend-dev -e "SPRING_PROFILES_ACTIVE=docker" online-shop-backend:latest
-```
-
-## **Configuration**
+## Configuration
 
 ### Database Configuration
 
@@ -205,7 +141,7 @@ docker run -d -p 8080:8080 --name online-shop-backend-dev -e "SPRING_PROFILES_AC
 - PayPal payment gateway integration
 - Supports both sandbox and production environments
 
-# Contact
+## Contact
 
 - **Email**: shuyaHsieh318@gmail.com
 - **Cake**: https://www.cake.me/me/shuyahsieh

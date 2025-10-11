@@ -1,24 +1,26 @@
-# ===== Stage 1: install JDK 17 (online) =====
-FROM ubuntu:22.04 AS jdk17
+# ===== Stage 1: Build the app =====
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
-LABEL stage="jdk17"
+WORKDIR /app
 
-# update packages and install OpenJDK 17 (include full JRE)
-RUN apt-get update && \
-    apt-get install -y openjdk-17-jdk openjdk-17-jre-headless && \
-    rm -rf /var/lib/apt/lists/*
+# Copy pom.xml first to leverage Docker cache
+COPY demo/pom.xml ./demo/
 
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-ENV PATH=$JAVA_HOME/bin:$PATH
+# Download dependencies (cached layer)
+RUN cd demo && mvn dependency:go-offline
 
-# ===== Stage 2: install Tomcat (offline) =====
+# Copy source code
+COPY demo/src ./demo/src/
+
+# Build the app and skip tests
+RUN cd demo && mvn clean package -DskipTests
+
+# ===== Stage 2: Prepare Tomcat (offline) =====
 FROM ubuntu:22.04 AS tomcat
-
-LABEL stage="tomcat"
 
 WORKDIR /usr/local
 
-# unzip Tomcat 10.1
+# Unzip Tomcat
 COPY apache-tomcat-10.1.46.tar.gz .
 
 RUN set -eux && \
@@ -26,23 +28,23 @@ RUN set -eux && \
     rm -f apache-tomcat-10.1.46.tar.gz && \
     mv apache-tomcat-10.1.46 tomcat
 
-# ===== Stage 3: final image =====
+# ===== Stage 3: Final runtime image =====
 FROM ubuntu:22.04
 
 LABEL maintainer="ShuYaHsieh <shuyahsieh318@gmail.com>" \
       version="1.0.0" \
       description="Spring Boot WAR deployment with Tomcat 10 (offline) & JDK17 (Online)"
 
-# install JDK
+# Install JRE for running the app
 RUN apt-get update && \
-    apt-get install -y openjdk-17-jdk && \
+    apt-get install -y openjdk-17-jre-headless curl && \
     rm -rf /var/lib/apt/lists/*
 
-# copy Tomcat
+# Copy Tomcat from preparation stage
 COPY --from=tomcat /usr/local/tomcat /usr/local/tomcat
 
-# copy Spring Boot WAR, built by Maven
-COPY demo/target/onlineShop.war /usr/local/tomcat/webapps/onlineShop.war
+# Copy Spring Boot WAR from build stage
+COPY --from=builder /app/demo/target/onlineShop.war /usr/local/tomcat/webapps/onlineShop.war
 
 ENV SPRING_PROFILES_ACTIVE=docker
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
