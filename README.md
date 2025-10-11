@@ -14,8 +14,10 @@ This is a modern e-commerce backend built with Spring Boot 3.3.0, providing user
 - **Build**: Maven 3.9.6
 - **Containerization**: Docker + Tomcat 10.1.46
 
-## Database Schema
-![Schema](docs/schema.png)
+## Highlights
+
+### Database Schema
+![Schema](/demo/docs/schema.png)
 
 ## Getting Start
 
