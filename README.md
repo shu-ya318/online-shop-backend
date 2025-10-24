@@ -1,6 +1,6 @@
-# Online Shop Backend
+# Online Shop - Backend
 
-This is a modern e-commerce backend built with Spring Boot 3.3.0, providing user management, product catalog, shopping cart, order processing, and payment functionality.
+This is a e-commerce backend built with Spring Boot 3.3.0, providing user management, product catalog, shopping cart, order processing, and payment functionality.
 
 ## Technology Stack
 
@@ -14,20 +14,18 @@ This is a modern e-commerce backend built with Spring Boot 3.3.0, providing user
 - **Build**: Maven 3.9.6
 - **Containerization**: Docker + Tomcat 10.1.46
 
-## Highlights
+## Database Schema
 
-### Database Schema
-![Schema](/demo/docs/schema.png)
+![Database Schema](demo/docs/schema.png)
 
 ## Getting Start
 
 ### Prerequisites
 
-- JDK 17+
-- Maven 3.9.6+
-- Microsoft SQL Server
-- Redis
-- Docker (optional)
+- JDK 17+ (required)
+- Maven 3.9.6+ (optional, or use the included Maven Wrapper)
+- MS SQL Server (optional, or use Docker)
+- Redis (optional, or use Docker)
 
 ### Installation
 
@@ -50,35 +48,100 @@ This is a modern e-commerce backend built with Spring Boot 3.3.0, providing user
 
 Start the development server:
 
-**Windows:**
+**Windows (CMD/PowerShell):**
 
 ```bash
-.\\demo\\mvnw.cmd spring-boot:run
+cd demo
+.\mvnw.cmd spring-boot:run
 ```
 
 **Unix/Linux/macOS:**
 
 ```bash
-./demo/mvnw spring-boot:run
+cd demo
+./mvnw spring-boot:run
 ```
 
-### Building
+> **Note:** The application will be available at `http://localhost:8080/onlineShop/` (or the port and context path configured in your properties files).
 
-**Windows:**
+### Deployment
 
-```bash
-.\\demo\\mvnw.cmd clean package
-```
+1. **Build for Production**
 
-**Unix/Linux/macOS:**
+    **Windows:**
 
-```bash
-./demo/mvnw clean package
-```
+    ```bash
+    cd demo
+    .\mvnw.cmd clean package
+    cd ..
+    ```
 
-### Containerization (Docker)
+    **Unix/Linux/macOS:**
 
-This project is designed to be managed and deployed using Docker Compose from a parent directory. Please refer to the `docker-compose.yml` file in the parent directory for instructions on building and running the services.
+    ```bash
+    cd demo
+    ./mvnw clean package
+    cd ..
+    ```
+
+    > **Note:** The built WAR file will be output to the `demo/target/` directory as `onlineShop.war`.
+
+2. **Deploy to Local with Tomcat**
+
+    After building the project, you can deploy the WAR file to your local Tomcat server:
+
+    **Windows:**
+    ```bash
+    copy demo\target\onlineShop.war C:\path\to\your\tomcat\webapps\onlineShop.war
+    
+    C:\path\to\your\tomcat\bin\catalina.bat run
+    ```
+
+    **Unix/Linux/macOS:**
+    ```bash
+    cp demo/target/onlineShop.war /path/to/your/tomcat/webapps/onlineShop.war
+
+    /path/to/your/tomcat/bin/catalina.sh run
+    ```
+
+    The application will be accessible at `http://localhost:8080/onlineShop/`
+
+    > **Note:** You can rename `onlineShop.war` to a different name if you want to change the application context path (e.g., `myapp.war` will be accessible at `http://localhost:8080/myapp/`).
+    
+    > **Prerequisites:** Make sure you have Apache Tomcat 10.x installed and configured with JDK 17+.
+
+3. **Containerization (Docker)**
+
+    This project can also be deployed using Docker Compose from the parent directory. Please refer to the `docker-compose.yml` file in the parent directory for containerized deployment instructions.
+
+    For standalone Docker deployment:
+
+    ```bash
+    # Build Docker image (multi-stage build)
+    docker build -t online-shop-backend:latest .
+    
+    # Run container with host.docker.internal (for local testing)
+    docker run -d -p 8080:8080 \
+      --name online-shop-backend \
+      -e SA_PASSWORD=YourStrong@Passw0rd \
+      -e REDIS_PASSWORD=YourRedisPassword \
+      -e SPRING_DATASOURCE_URL=jdbc:sqlserver://host.docker.internal:1433;databaseName=onlineShopDB;encrypt=true;trustServerCertificate=true; \
+      -e SPRING_DATA_REDIS_HOST=host.docker.internal \
+      online-shop-backend:latest
+    ```
+
+    The application will be accessible at `http://localhost:8080/onlineShop/`
+
+    > **Note:** 
+    > - **Custom Context Path**: All environments (local, Docker, Tomcat) are configured to use the `/onlineShop` context path. The application will always be accessible at `http://localhost:8080/onlineShop/`.
+    > - The container uses `SPRING_PROFILES_ACTIVE=docker` by default (set in Dockerfile).
+    > - You must provide `SA_PASSWORD` and `REDIS_PASSWORD` environment variables.
+    > - The above command assumes SQL Server and Redis are running on your host machine (accessible via `host.docker.internal`).
+    > - **For multi-container deployment**: If you want to run this container together with `database` and `cache` containers in the same Docker network, you need to:
+    >   - Create a Docker network: `docker network create online-shop-network`
+    >   - Add `--network online-shop-network` to all container run commands
+    >   - Remove the `SPRING_DATASOURCE_URL` and `SPRING_DATA_REDIS_HOST` overrides (it will use default `database:1433` and `cache:6379`)
+    > - You can change the port mapping (e.g., `-p 9090:8080`) to expose the application on a different host port.
 
 ## Project Structure
 
@@ -142,9 +205,3 @@ online-shop-backend/
 
 - PayPal payment gateway integration
 - Supports both sandbox and production environments
-
-## Contact
-
-- **Email**: shuyaHsieh318@gmail.com
-- **Cake**: https://www.cake.me/me/shuyahsieh
-- **Linkedin**: https://www.linkedin.com/in/%E6%B7%91%E9%9B%85-%E8%AC%9D-9906772b1/
