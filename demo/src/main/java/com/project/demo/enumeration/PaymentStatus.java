@@ -1,8 +1,8 @@
 package com.project.demo.enumeration;
 
 public enum PaymentStatus {
-    PAY_ON_DELIVERY, // 等待貨到付款
-    AUTHORIZED, // 等待在第三方支付完成授權
+    PAY_ON_DELIVERY, // Waiting for cash on delivery
+    AUTHORIZED, // Waiting for external payment authorization to complete
     SUCCESS, 
     FAILED, 
     CANCELLED, 

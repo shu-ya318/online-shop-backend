@@ -53,21 +53,18 @@ public class UserService {
     // Register
     @Transactional
     public void register(UserRegisterRequestDTO dto) {
-        // 檢查 email 是否已註冊且未被刪除
         Optional<User> optionalUser = userRepository.findByEmail(dto.email());
 
         User user;
 
         if (optionalUser.isPresent()) {
             if (!optionalUser.get().isDeleted()) {
-                throw new UserAlreadyExistsException("Email already registered");
+                throw new UserAlreadyExistsException("Email already registered!");
             }
 
-            // 軟刪除帳號再註冊：重新啟用帳號
             user = optionalUser.get();
             userMapper.updateUserFromUserRegisterRequestDTO(dto, user);
         } else {
-            // 新使用者
             user = userMapper.toUser(dto);
         }
 
@@ -85,14 +82,14 @@ public class UserService {
     // Login
     public UserLoginResponseDTO login(UserLoginRequestDTO dto) {
         User user = userRepository.findByEmail(dto.email())
-                .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password!"));
 
         if (user.isDeleted()) {
-            throw new UserDeletedException("User is deleted");
+            throw new UserDeletedException("User is deleted!");
         }
 
         if (!passwordEncoder.matches(dto.password(), user.getPassword())) {
-            throw new InvalidCredentialsException("Invalid email or password");
+            throw new InvalidCredentialsException("Invalid email or password!");
         }
 
         user.setLastLoginAt(LocalDateTime.now());
@@ -102,7 +99,7 @@ public class UserService {
 
         userRepository.save(user);
 
-        // 處理 Token，提供給客戶端
+        // Handle token, provide to client
         var roles = user.getUserRoles().stream().map(Enum::name).collect(Collectors.toSet());
 
         String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUuid(), user.getEmail(),
@@ -121,9 +118,9 @@ public class UserService {
 
         response.addCookie(refreshCookie);
 
-        UserLoginResponseDTO loginResponse = userMapper.toUserLoginResponseDTO(accessToken);
+        UserLoginResponseDTO loginResponseDTO = userMapper.toUserLoginResponseDTO(accessToken);
 
-        return loginResponse;
+        return loginResponseDTO;
     }
 
     // OAuth2 Authorization Code Exchange
@@ -132,14 +129,14 @@ public class UserService {
         String redisOAuth2Code = redisService.getOAuth2AuthCode(oauth2Code);
 
         if (redisOAuth2Code == null) {
-            throw new InvalidTokenException("oauth2 code not found in redis");
+            throw new InvalidTokenException("oauth2 code not found in redis!");
         }
 
         User user = userRepository.findByUuid(UUID.fromString(redisOAuth2Code))
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found!"));
 
         if (user.isDeleted()) {
-            throw new UserDeletedException("User account is deleted");
+            throw new UserDeletedException("User account is deleted!");
         }
 
         var roles = user.getUserRoles().stream().map(Enum::name).collect(Collectors.toSet());
@@ -159,7 +156,8 @@ public class UserService {
 
         response.addCookie(refreshCookie);
 
-        return userMapper.toUserLoginResponseDTO(accessToken);
+        UserLoginResponseDTO responseDTO = userMapper.toUserLoginResponseDTO(accessToken);
+        return responseDTO;
     }
 
     // Refresh Token
@@ -176,7 +174,7 @@ public class UserService {
         }
 
         if (refreshToken == null) {
-            throw new InvalidTokenException("Refresh token not found in cookie");
+            throw new InvalidTokenException("Refresh token not found in cookie!");
         }
 
         String uuid;
@@ -184,18 +182,18 @@ public class UserService {
         try {
             uuid = jwtUtil.getUuidFromRefreshToken(refreshToken);
         } catch (Exception e) {
-            throw new InvalidTokenException("Invalid refresh token format");
+            throw new InvalidTokenException("Invalid refresh token format!");
         }
 
         if (!jwtUtil.validateRefreshToken(UUID.fromString(uuid), refreshToken)) {
-            throw new InvalidTokenException("Invalid or expired refresh token");
+            throw new InvalidTokenException("Invalid or expired refresh token!");
         }
 
         User user = userRepository.findByUuid(UUID.fromString(uuid))
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found!"));
 
         if (user.isDeleted()) {
-            throw new UserDeletedException("User account is deleted");
+            throw new UserDeletedException("User account is deleted!");
         }
 
         String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUuid(), user.getEmail(),
@@ -209,7 +207,9 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
-        return userMapper.toResponseDto(user);
+        UserResponseDTO responseDTO = userMapper.toResponseDto(user);
+
+        return responseDTO;
     }
 
     // Update User profile
@@ -221,7 +221,9 @@ public class UserService {
         userMapper.updateUserFromUserUpdateRequestDTO(dto, user);
         userRepository.save(user);
 
-        return userMapper.toResponseDto(user);
+        UserResponseDTO responseDTO = userMapper.toResponseDto(user);
+
+        return responseDTO;
     }
 
     // Update password
@@ -231,7 +233,7 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
         if (!passwordEncoder.matches(dto.oldPassword(), user.getPassword())) {
-            throw new IncorrectPasswordException("Incorrect old password");
+            throw new IncorrectPasswordException("Incorrect old password!");
         }
 
         String encodedPassword = passwordEncoder.encode(dto.newPassword());

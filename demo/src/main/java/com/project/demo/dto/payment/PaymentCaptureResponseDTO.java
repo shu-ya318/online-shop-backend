@@ -7,6 +7,6 @@ import com.project.demo.enumeration.PaymentStatus;
 public record PaymentCaptureResponseDTO(
         PaymentStatus status,
 
-        // ===== 關聯 =====
+        // ===== Relation =====
         UUID orderUuid) {
 }

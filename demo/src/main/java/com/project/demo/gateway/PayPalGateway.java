@@ -37,22 +37,19 @@ public class PayPalGateway implements PaymentGateway {
     @Value("${frontend.url}")
     private String frontendUrl;
 
-    // 用上述基礎設定，作為與 PayPal API 溝通的身分驗證
     private APIContext getAPIContext() {
         APIContext apiContext = new APIContext(clientId, clientSecret, mode);
 
         return apiContext;
     }
 
-    // 1.授權階段，後端處理請求參數，讓前端夾帶參數 重導向到 PayPal 授權頁
+    // 1.Authorization stage, backend handles request parameters, let frontend carry parameters to redirect to PayPal authorization page
     @Override
     public PaymentGatewayResponseDTO createPayment(Payment payment) {
         try {
-            // 建立 付款人資訊
             Payer payer = new Payer();
             payer.setPaymentMethod("paypal");
 
-            // 建立 重定向URL
             String orderUuid = payment.getOrder().getUuid().toString();
 
             RedirectUrls redirectUrls = new RedirectUrls();
@@ -60,7 +57,7 @@ public class PayPalGateway implements PaymentGateway {
             redirectUrls
                     .setCancelUrl(frontendUrl + "/order?status=" + PaymentStatus.CANCELLED + "&orderUuid=" + orderUuid);
 
-            // 建立 交易資訊
+            // Create payment amount
             Amount amount = new Amount();
             amount.setTotal(payment.getAmount().toPlainString());
             amount.setCurrency(payment.getCurrency());
@@ -72,7 +69,7 @@ public class PayPalGateway implements PaymentGateway {
             List<Transaction> transactions = new ArrayList<>();
             transactions.add(transaction);
 
-            // 組裝 完整請求資訊
+            // Assemble complete request information
             com.paypal.api.payments.Payment requestPayment = new com.paypal.api.payments.Payment();
 
             requestPayment.setIntent("sale");
@@ -80,7 +77,7 @@ public class PayPalGateway implements PaymentGateway {
             requestPayment.setRedirectUrls(redirectUrls);
             requestPayment.setTransactions(transactions);
 
-            // 發送 請求授權請求
+            // Send request authorization request
             com.paypal.api.payments.Payment createdPayment = requestPayment.create(getAPIContext());
 
             String approvalUrl = getApprovalUrl(createdPayment)
@@ -95,23 +92,23 @@ public class PayPalGateway implements PaymentGateway {
         }
     }
 
-    // (2.確認階段 由 用戶 和 授權伺服器 共同完成)
-    // 3.執行階段
+    // (2.Confirmation stage, completed by user and authorization server)
+    // 3.Execution stage
     @Override
     public PaymentGatewayResponseDTO capturePayment(PaymentGatewayRequestDTO requestDTO) {
         try {
-            // 建立 執行支付資訊，附加的payerId
+            // Create execution payment information, additional payerId
             PaymentExecution paymentExecution = new PaymentExecution();
             paymentExecution.setPayerId(requestDTO.payerId());
 
-            // 指向 PayPal伺服器已授權狀態的交易
+            // Point to PayPal server authorized transaction
             com.paypal.api.payments.Payment payment = new com.paypal.api.payments.Payment()
                     .setId(requestDTO.paymentId());
 
-            // 發送 執行支付請求
+            // Send execution payment request
             com.paypal.api.payments.Payment executedPayment = payment.execute(getAPIContext(), paymentExecution);
 
-            // 依照執行結果，返回不同資訊
+            // Return different information according to execution result
             if ("approved".equalsIgnoreCase(executedPayment.getState())) {
                 String transactionId = executedPayment.getTransactions().get(0).getRelatedResources().get(0).getSale()
                         .getId();

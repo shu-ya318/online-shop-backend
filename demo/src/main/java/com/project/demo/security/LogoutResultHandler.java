@@ -31,7 +31,7 @@ public class LogoutResultHandler implements LogoutSuccessHandler {
             throws IOException, ServletException {
 
         try {
-            // 從Cookie中取得並移除refreshToken
+            // Get and remove refreshToken from Cookie
             String refreshToken = null;
             if (request.getCookies() != null) {
                 refreshToken = Arrays.stream(request.getCookies())
@@ -41,7 +41,7 @@ public class LogoutResultHandler implements LogoutSuccessHandler {
                         .orElse(null);
             }
 
-            // 移除Redis的refreshToken
+            // Remove refreshToken from Redis
             if (refreshToken != null) {
                 String uuid = jwtUtil.getUuidFromRefreshToken(refreshToken);
                 jwtUtil.revokeRefreshToken(UUID.fromString(uuid));
@@ -63,7 +63,7 @@ public class LogoutResultHandler implements LogoutSuccessHandler {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-            Map<String, String> body = Map.of("message", "Logout failed due to a server error.");
+            Map<String, String> body = Map.of("message", "Logout failed due to a server error!");
             new ObjectMapper().writeValue(response.getWriter(), body);
         }
     }

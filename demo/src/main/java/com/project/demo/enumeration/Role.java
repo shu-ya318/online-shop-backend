@@ -1,13 +1,13 @@
 package com.project.demo.enumeration;
 
 public enum Role {
-	// ===== 前台 =====
-    GUEST,       // 訪客，未登入，僅能瀏覽商品與資訊，無法購物或查看個人資料
-    CUSTOMER,    // 顧客，註冊用戶，可購物、下單、管理自己的訂單與個人資料
-    SELLER,      // 賣家，認證用戶，可管理商品、訂單、庫存
+	// ===== Frontend =====
+    GUEST,       // Guest, not logged in, can only browse products and information, cannot shop or view personal information
+    CUSTOMER,    // Customer, registered user, can shop, place orders, manage their own orders and personal information
+    SELLER,      // Seller, certified user, can manage products, orders, and inventory
     
-    // ===== 後台 =====
-    USER,        // 一般使用者,賣家
-    ADMIN,       // 系統管理員
-    SUPER_ADMIN, // 超級管理員 // 如: 可見軟刪除的帳戶
+    // ===== TODO: Backend =====
+    USER,        // User, Seller
+    ADMIN,       // System administrator
+    SUPER_ADMIN, // Super administrator // Can see soft deleted accounts
 }

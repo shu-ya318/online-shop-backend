@@ -11,6 +11,6 @@ public record CartItemDTO(
         String imageUrl,
         Integer quantity,
 
-        // ===== 關聯 =====
+        // ===== Relation =====
         UUID productUuid) {
 }

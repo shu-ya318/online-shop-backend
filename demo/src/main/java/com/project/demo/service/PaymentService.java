@@ -52,19 +52,19 @@ public class PaymentService {
                 payment.setCreatedAt(LocalDateTime.now());
                 payment.setMethod(dto.method());
 
-                // 依不同支付方式，有不同執行邏輯 (包含payment實現細節)
+                // Depending on different payment methods, there are different execution logic (including payment implementation details)
                 PaymentGateway gateway = paymentGatewayFactory.getGateway(dto.method())
                                 .orElseThrow(() -> new OperationNotSupportedException(
                                                 "Payment method not supported: " + dto.method()));
 
                 PaymentGatewayResponseDTO gatewayResponse = gateway.createPayment(payment);
-                // 選擇支付方法，就寫入初始化的transactionId、status
+                // Choose payment method, write the initialized transactionId and status
                 payment.setTransactionId(gatewayResponse.transactionId());
                 payment.setStatus(gatewayResponse.status());
 
                 paymentRepository.save(payment);
 
-                // 對於貨到付款，直接更新訂單狀態（不需要外部確認）
+                // For cash on delivery, directly update the order status (no external confirmation required)
                 if (payment.getStatus() == PaymentStatus.PAY_ON_DELIVERY) {
                         order.setStatus(OrderStatus.PROCESSING);
                         order.setUpdatedAt(LocalDateTime.now());
@@ -72,21 +72,23 @@ public class PaymentService {
                         orderRepository.save(order);
                 }
 
-                PaymentResponseDTO response = paymentMapper.toPaymentResponseDTO(payment);
+                PaymentResponseDTO responseDTO = paymentMapper.toPaymentResponseDTO(payment);
 
-                return new PaymentResponseDTO(
-                                response.uuid(),
-                                response.transactionId(),
-                                response.status(),
-                                response.method(),
-                                response.amount(),
-                                response.currency(),
-                                response.orderUuid(),
-                                // 因應外部支付平台通常有redirectUrl，需要跳轉
+                PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(
+                                responseDTO.uuid(),
+                                responseDTO.transactionId(),
+                                responseDTO.status(),
+                                responseDTO.method(),
+                                responseDTO.amount(),
+                                responseDTO.currency(),
+                                responseDTO.orderUuid(),
+                                // For external payment platforms
                                 gatewayResponse.redirectUrl());
+
+                return paymentResponseDTO;
         }
 
-        // 因應外部支付平台通常需跳轉，再確認交易最終狀態
+        // For external payment platforms, usually need to redirect, then confirm the final transaction status
         @Transactional
         public PaymentCaptureResponseDTO capturePayment(PaymentGatewayRequestDTO dto) {
                 Payment payment = paymentRepository.findByTransactionId(dto.paymentId())
@@ -97,30 +99,33 @@ public class PaymentService {
                                 .orElseThrow(() -> new OperationNotSupportedException(
                                                 "Payment method not supported: " + payment.getMethod()));
 
-                PaymentGatewayResponseDTO gatewayResponse = gateway.capturePayment(dto);
+                PaymentGatewayResponseDTO gatewayResponseDTO = gateway.capturePayment(dto);
 
-                payment.setStatus(gatewayResponse.status());
-                payment.setTransactionId(gatewayResponse.transactionId());
+                payment.setStatus(gatewayResponseDTO.status());
+                payment.setTransactionId(gatewayResponseDTO.transactionId());
 
                 paymentRepository.save(payment);
 
                 Order order = payment.getOrder();
+
                 if (order == null) {
                         throw new EntityNotFoundException(
-                                        "Order not found for payment transactionId: " + dto.paymentId());
+                        "Order not found for payment transactionId: " + dto.paymentId());
                 }
 
-                // 對於外部支付平台，依最終支付結果更新訂單狀態
-                if (gatewayResponse.status() == PaymentStatus.SUCCESS) {
+                // For external payment platforms, update the order status based on the final payment result
+                if (gatewayResponseDTO.status() == PaymentStatus.SUCCESS) {
                         order.setStatus(OrderStatus.PROCESSING);
                         order.setUpdatedAt(LocalDateTime.now());
 
                         orderRepository.save(order);
                 } else {
-                        // 支付失敗或取消，取消訂單
+                        // If payment fails or is cancelled, cancel the order
                         orderService.cancelOrderByUuid(order.getUuid());
                 }
 
-                return new PaymentCaptureResponseDTO(payment.getStatus(), order.getUuid());
+                PaymentCaptureResponseDTO responseDTO = new PaymentCaptureResponseDTO(payment.getStatus(), order.getUuid());
+
+                return responseDTO;
         }
 }

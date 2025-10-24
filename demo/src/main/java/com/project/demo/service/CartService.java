@@ -70,7 +70,9 @@ public class CartService {
 
         cartRepository.save(cart);
 
-        return cartMapper.toCartResponseDTO(cart);
+        CartResponseDTO responseDTO = cartMapper.toCartResponseDTO(cart);
+
+        return responseDTO;
     }
 
     // Get cart by user uuid
@@ -78,7 +80,9 @@ public class CartService {
         Cart cart = cartRepository.findByUserUuid(userUuid)
                 .orElseGet(() -> createCartForUser(userUuid));
 
-        return cartMapper.toCartResponseDTO(cart);
+        CartResponseDTO responseDTO = cartMapper.toCartResponseDTO(cart);
+
+        return responseDTO;
     }
 
     // --------- CartItem ---------
@@ -103,7 +107,9 @@ public class CartService {
 
         cartRepository.save(cart);
 
-        return cartMapper.toCartResponseDTO(cart);
+        CartResponseDTO responseDTO = cartMapper.toCartResponseDTO(cart);
+
+        return responseDTO;
     }
 
     // Remove item from cart
@@ -118,7 +124,9 @@ public class CartService {
 
         cartRepository.save(cart);
 
-        return cartMapper.toCartResponseDTO(cart);
+        CartResponseDTO responseDTO = cartMapper.toCartResponseDTO(cart);
+
+        return responseDTO;
     }
 
     // Clear cart
@@ -144,18 +152,24 @@ public class CartService {
         cart.setUuid(UUID.randomUUID());
         cart.setCreatedAt(LocalDateTime.now());
 
-        return cartRepository.save(cart);
+        Cart savedCart = cartRepository.save(cart);
+
+        return savedCart;
     }
 
     private Cart getExistingCartByUserUuid(UUID userUuid) {
-        return cartRepository.findByUserUuid(userUuid)
+        Cart cart = cartRepository.findByUserUuid(userUuid)
                 .orElseThrow(() -> new EntityNotFoundException("Cart not found for user with uuid: " + userUuid));
+
+        return cart;
     }
 
     private CartItem getCartItemByProductUuid(Cart cart, UUID productUuid) {
-        return cart.getItems().stream()
+        CartItem cartItem = cart.getItems().stream()
                 .filter(item -> item.getProduct().getUuid().equals(productUuid))
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("Product not found in cart with uuid: " + productUuid));
+
+        return cartItem;
     }
 }

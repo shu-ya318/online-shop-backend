@@ -31,15 +31,16 @@ import lombok.ToString;
 @Setter
 @ToString(exclude = "password")
 public class User implements UserDetails {
+
     private static final long serialVersionUID = 1L;
 
-    // ===== 主鍵 =====
+    // ===== Primary Key =====
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
 
-    // ===== 基本資訊 =====
+    // ===== Basic Info =====
     @Column(name = "uuid", nullable = false, unique = true, updatable = false)
     private UUID uuid;
 
@@ -47,7 +48,7 @@ public class User implements UserDetails {
     private String email;
 
     @Column(name = "password", length = 255)
-    private String password; // 已加密
+    private String password; // Encrypted
 
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
@@ -56,13 +57,13 @@ public class User implements UserDetails {
     @Column(name = "account_status", nullable = false, length = 20)
     private AccountStatus accountStatus = AccountStatus.REGISTERED;
 
-    // ===== 角色權限 =====
+    // ===== Role Permission =====
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     private Set<Role> userRoles = new HashSet<>(Set.of(Role.CUSTOMER));
 
-    // ===== 授權相關 =====
+    // ===== Authorization Related =====
     @Enumerated(EnumType.STRING)
     @Column(name = "auth_provider", length = 20)
     private AuthProvider authProvider = AuthProvider.LOCAL;
@@ -73,7 +74,7 @@ public class User implements UserDetails {
     @Column(name = "refresh_token_expiry")
     private LocalDateTime refreshTokenExpiry;
 
-    // ===== 審計欄位 =====
+    // ===== Audit Fields =====
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -86,21 +87,21 @@ public class User implements UserDetails {
     @Column(name = "updated_by", length = 50)
     private String updatedBy;
 
-    // ===== 登入資訊 =====
+    // ===== Login Info =====
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
     @Column(name = "last_login_ip", length = 45)
     private String lastLoginIp;
 
-    // ===== 密碼相關 =====
+    // ===== Password Related =====
     @Column(name = "two_factor_enabled", nullable = false)
     private boolean twoFactorEnabled = false;
 
     @Column(name = "password_changed_at")
     private LocalDateTime passwordChangedAt;
 
-    // ===== 個人資料 =====
+    // ===== Personal Info =====
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
@@ -113,14 +114,14 @@ public class User implements UserDetails {
     @Column(name = "avatar_url", length = 255)
     private String avatarUrl;
 
-    // ===== 軟刪除 =====
+    // ===== Soft Delete =====
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    // ===== equals 與 hashCode 只比對主鍵 =====
+    // ===== equals and hashCode only compare primary key =====
     @Override
     public boolean equals(Object object) {
         if (this == object)

@@ -37,23 +37,25 @@ public class CartController {
     /*
      * POST method
      */
+
     @PostMapping(API_CURRENT_USER_CART_ITEMS)
     public ResponseEntity<CartResponseDTO> addItemToCart(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody CartAddItemRequestDTO dto) {
-        CartResponseDTO response = cartService.addItemToCart(user.getUuid(), dto);
+        CartResponseDTO responseDTO = cartService.addItemToCart(user.getUuid(), dto);
         
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseDTO);
     }
 
     /*
      * GET method
      */
+
     @GetMapping(API_CURRENT_USER_CART)
     public ResponseEntity<CartResponseDTO> getCartByUserUuid(@AuthenticationPrincipal User user) {
-        CartResponseDTO response = cartService.getCartByUserUuid(user.getUuid());
+        CartResponseDTO responseDTO = cartService.getCartByUserUuid(user.getUuid());
         
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseDTO);
     }
 
     // --------- CartItem ---------
@@ -61,25 +63,27 @@ public class CartController {
     /*
      * PUT
      */
+
     @PutMapping(API_CURRENT_USER_CART_ITEM_BY_UUID)
     public ResponseEntity<CartResponseDTO> updateCartItemQuantity(
             @AuthenticationPrincipal User user,
             @PathVariable UUID productUuid,
             @Valid @RequestBody CartUpdateItemRequestDTO dto) {
-        CartResponseDTO response = cartService.updateCartItemQuantity(user.getUuid(), productUuid, dto.quantity());
+        CartResponseDTO responseDTO = cartService.updateCartItemQuantity(user.getUuid(), productUuid, dto.quantity());
         
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseDTO);
     }
 
     /*
      * DELETE
      */
+
     @DeleteMapping(API_CURRENT_USER_CART_ITEM_BY_UUID)
     public ResponseEntity<CartResponseDTO> removeItemFromCart(
             @AuthenticationPrincipal User user,
             @PathVariable UUID productUuid) {
-        CartResponseDTO response = cartService.removeItemFromCart(user.getUuid(), productUuid);
+        CartResponseDTO responseDTO = cartService.removeItemFromCart(user.getUuid(), productUuid);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseDTO);
     }
 }

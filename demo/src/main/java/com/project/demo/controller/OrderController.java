@@ -1,5 +1,7 @@
 package com.project.demo.controller;
 
+import java.util.UUID;
+
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -26,8 +28,6 @@ import static com.project.demo.data.PathConstantData.API_CURRENT_USER_ORDERS;
 import static com.project.demo.data.PathConstantData.API_CURRENT_USER_ORDER_BY_UUID;
 import static com.project.demo.data.PathConstantData.API_CURRENT_USER_ORDER_CANCEL_BY_UUID;
 
-import java.util.UUID;
-
 @RestController
 @RequiredArgsConstructor
 public class OrderController {
@@ -39,18 +39,20 @@ public class OrderController {
     /*
      * POST method
      */
+
     @PostMapping(API_CURRENT_USER_ORDERS)
     public ResponseEntity<OrderResponseDTO> createOrder(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody OrderCreateRequestDTO dto) {
-        OrderResponseDTO response = orderService.createOrder(user.getUuid(), dto);
+        OrderResponseDTO responseDTO = orderService.createOrder(user.getUuid(), dto);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseDTO);
     }
 
     /*
      * GET method
      */
+
     @GetMapping(API_CURRENT_USER_ORDERS)
     public ResponseEntity<PaginatedResponse<OrderResponseDTO>> getOrders(
             @AuthenticationPrincipal User user,
@@ -58,29 +60,30 @@ public class OrderController {
             @RequestParam(defaultValue = "8") int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        PaginatedResponse<OrderResponseDTO> response = orderService.getOrders(user.getUuid(), pageable);
+        PaginatedResponse<OrderResponseDTO> responseDTO = orderService.getOrders(user.getUuid(), pageable);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseDTO);
     }
 
     @GetMapping(API_CURRENT_USER_ORDER_BY_UUID)
     public ResponseEntity<OrderResponseDTO> getOrderByUuid(
             @AuthenticationPrincipal User user,
             @PathVariable UUID uuid) {
-        OrderResponseDTO response = orderService.getOrderByUuid(uuid);
+        OrderResponseDTO responseDTO = orderService.getOrderByUuid(uuid);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseDTO);
     }
 
     /*
      * PATCH method
      */
+
     @PatchMapping(API_CURRENT_USER_ORDER_CANCEL_BY_UUID)
     public ResponseEntity<OrderResponseDTO> cancelOrderByUuid(
             @AuthenticationPrincipal User user,
             @PathVariable UUID uuid) {
-        OrderResponseDTO response = orderService.cancelOrderByUuid(uuid);
+        OrderResponseDTO responseDTO = orderService.cancelOrderByUuid(uuid);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseDTO);
     }
 }

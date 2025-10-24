@@ -6,12 +6,12 @@ import java.util.UUID;
 
 public record CartResponseDTO(
         UUID cartUuid,
-        List<CartItemDTO> items, // 有序性、易用性(便於客戶端把List 序列化成 JSON 陣列)
+        List<CartItemDTO> items, // Orderness and ease of use
         BigDecimal subtotal,
         BigDecimal shipping,
         BigDecimal total,
         Integer totalQuantity,
 
-        // ===== 關聯 =====
+        // ===== Relation =====
         UUID userUuid) {
 }

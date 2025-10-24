@@ -30,13 +30,13 @@ import lombok.ToString;
 @ToString
 public class Product {
 
-	// ===== 主鍵 =====
+	// ===== Primary Key =====
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "product_id")
 	private Long id;
 
-	// ===== 基本資訊 =====
+	// ===== Basic Info =====
 	@Column(name = "uuid", nullable = false, unique = true, updatable = false)
 	private UUID uuid;
 

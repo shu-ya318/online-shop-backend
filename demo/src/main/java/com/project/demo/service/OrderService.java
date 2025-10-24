@@ -70,23 +70,26 @@ public class OrderService {
 
         cartService.clearCart(userUuid);
 
-        OrderResponseDTO response = orderMapper.toOrderResponseDTO(savedOrder);
+        OrderResponseDTO responseDTO = orderMapper.toOrderResponseDTO(savedOrder);
 
-        return response;
+        return responseDTO;
     }
 
     // Get all orders by user uuid
     public PaginatedResponse<OrderResponseDTO> getOrders(UUID userUuid, Pageable pageable) {
         Page<Order> orderPage = orderRepository.findByUserUuid(userUuid, pageable);
 
-        List<OrderResponseDTO> orderDTOs = orderMapper.toOrderResponseDTOs(orderPage.getContent());
+        List<OrderResponseDTO> orderDTO = orderMapper.toOrderResponseDTOs(orderPage.getContent());
 
-        return new PaginatedResponse<>(
-                orderDTOs,
+
+        PaginatedResponse<OrderResponseDTO> responseDTO = new PaginatedResponse<>(
+                orderDTO,
                 orderPage.getNumber(),
-                orderPage.getSize(),
-                orderPage.getTotalElements(),
-                orderPage.getTotalPages());
+            orderPage.getSize(),
+            orderPage.getTotalElements(),
+            orderPage.getTotalPages());
+
+        return responseDTO;
     }
 
     // Get order by uuid
@@ -94,9 +97,9 @@ public class OrderService {
         Order order = orderRepository.findByUuid(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found with uuid: " + uuid));
 
-        OrderResponseDTO response = orderMapper.toOrderResponseDTO(order);
+        OrderResponseDTO responseDTO = orderMapper.toOrderResponseDTO(order);
 
-        return response;
+        return responseDTO;
     }
 
     // Cancel order by uuid
@@ -117,9 +120,9 @@ public class OrderService {
             orderRepository.save(order);
         }
 
-        OrderResponseDTO response = orderMapper.toOrderResponseDTO(order);
+        OrderResponseDTO responseDTO = orderMapper.toOrderResponseDTO(order);
 
-        return response;
+        return responseDTO;
     }
 
     // Scheduled task to cancel expired orders

@@ -14,9 +14,9 @@ public record PaymentResponseDTO(
         BigDecimal amount,
         String currency,
 
-        // ===== 關聯 =====
+        // ===== Relation =====
         UUID orderUuid,
 
-        // ===== Gateway 回傳 =====
+        // ===== Gateway Return =====
         String redirectUrl) {
 }

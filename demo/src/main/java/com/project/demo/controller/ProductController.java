@@ -34,8 +34,9 @@ public class ProductController {
     /*
      * GET method
      */
+
     @GetMapping(API_PRODUCTS)
-    public ResponseEntity<?> getProducts(
+    public ResponseEntity<PaginatedResponse<ProductResponseDTO>> getProducts(
             @RequestParam(name = "filter[keyword]", required = false) String keyword,
             @RequestParam(name = "filter[category]", required = false) Category category,
             @RequestParam(defaultValue = "0") int page,
@@ -45,15 +46,15 @@ public class ProductController {
         ProductFilterRequestDTO filter = new ProductFilterRequestDTO(keyword, category);
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
 
-        PaginatedResponse<ProductResponseDTO> response = productService.getProducts(filter, pageable);
+        PaginatedResponse<ProductResponseDTO> responseDTO = productService.getProducts(filter, pageable);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseDTO);
     }
 
     @GetMapping(API_PRODUCT_BY_UUID)
-    public ResponseEntity<?> getProductByUuid(@PathVariable UUID uuid) {
-        ProductResponseDTO response = productService.getProductByUuid(uuid);
+    public ResponseEntity<ProductResponseDTO> getProductByUuid(@PathVariable UUID uuid) {
+        ProductResponseDTO responseDTO = productService.getProductByUuid(uuid);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseDTO);
     }
 }

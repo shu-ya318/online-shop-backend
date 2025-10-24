@@ -20,15 +20,15 @@ import com.project.demo.mapper.util.PriceCalculationUtils;
 
 @Mapper(componentModel = "spring", uses = { PriceCalculationUtils.class, ProductMapper.class })
 public interface CartMapper {
-
     // --------- Cart ---------
-    // 1-1.欄位對應名稱不同
+
+    // 1-1.Field names are different
     @Mapping(target = "cartUuid", source = "uuid")
-    // 1-2.巢狀物件的欄位，只需要取得物件指定欄位
+    // 1-2.Nested object fields, only get object specified fields
     @Mapping(target = "userUuid", source = "user.uuid")
-    // 2.複雜的物件集合轉換
+    // 2.Complex object collection conversion
     @Mapping(target = "items", source = "items", qualifiedByName = "toCartItemDTOs")
-    // 3.動態計算的欄位
+    // 3.Dynamic calculated fields
     @Mapping(target = "subtotal", source = "items", qualifiedByName = "calculateSubtotal")
     @Mapping(target = "shipping", source = "items", qualifiedByName = "calculateShipping")
     @Mapping(target = "total", source = "items", qualifiedByName = "calculateTotal")
@@ -36,31 +36,36 @@ public interface CartMapper {
     CartResponseDTO toCartResponseDTO(Cart cart);
 
     // --------- CartItem ---------
+
     @Named("toCartItemDTOs")
     default List<CartItemDTO> toCartItemDTOs(Set<CartItem> items) {
-        if (items == null)
+        if (items == null) {
             return Collections.emptyList();
+        }
 
         ProductMapper productMapper = Mappers.getMapper(ProductMapper.class);
 
-        return items.stream()
+        List<CartItemDTO> dtoList = items.stream()
                 .sorted((item1, item2) -> Long.compare(item1.getId(), item2.getId()))
                 .map(item -> toCartItemDTO(item, productMapper))
                 .collect(Collectors.toList());
+
+        return dtoList;
     }
 
     default CartItemDTO toCartItemDTO(CartItem cartItem, ProductMapper productMapper) {
         Product product = cartItem.getProduct();
 
-        if (product == null)
+        if (product == null) {
             return null;
+        }
 
         BigDecimal discountPrice = productMapper.calculateDiscountPrice(product);
         String imageUrl = product.getImageUrl() == null ? "" : product.getImageUrl();
         BigDecimal discountPercentage = product.getDiscountPercentage() == null ? BigDecimal.ZERO
                 : product.getDiscountPercentage();
 
-        return new CartItemDTO(
+        CartItemDTO cartItemDTO = new CartItemDTO(
                 product.getName(),
                 product.getPrice(),
                 discountPercentage,
@@ -68,5 +73,7 @@ public interface CartMapper {
                 imageUrl,
                 cartItem.getQuantity(),
                 product.getUuid());
+
+        return cartItemDTO;
     }
 }

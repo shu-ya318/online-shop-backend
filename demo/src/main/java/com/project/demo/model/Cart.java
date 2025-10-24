@@ -17,6 +17,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Index;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -30,26 +31,25 @@ import lombok.ToString;
 @ToString
 public class Cart {
 
-    // ===== 主鍵 =====
+    // ===== Primary Key =====
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cart_id")
     private Long id;
 
-    // ===== 基本資訊 =====
+    // ===== Basic Information =====
     @Column(name = "uuid", nullable = false, unique = true, updatable = false)
     private UUID uuid;
 
-    // ===== 關聯 =====
+    // ===== Relation =====
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_uuid", referencedColumnName = "uuid", nullable = false, unique = true)
     private User user;
 
-    // TODOl: 是否加上nullable = false
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<CartItem> items = new HashSet<>(); // 唯一性(避免重複CartItem)、無序性
+    private Set<CartItem> items = new HashSet<>(); // Uniqueness(avoid duplicate CartItem)、Unorderedness
 
-    // ===== 審計欄位 =====
+    // ===== Audit Fields =====
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

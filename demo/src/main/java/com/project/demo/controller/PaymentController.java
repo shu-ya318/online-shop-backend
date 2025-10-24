@@ -14,12 +14,12 @@ import com.project.demo.dto.payment.PaymentResponseDTO;
 import com.project.demo.model.User;
 import com.project.demo.service.PaymentService;
 
-import static com.project.demo.data.PathConstantData.API_CURRENT_USER_PAYMENTS;
-import static com.project.demo.data.PathConstantData.API_CURRENT_USER_PAYMENTS_CAPTURE;
-
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
+
+import static com.project.demo.data.PathConstantData.API_CURRENT_USER_PAYMENTS;
+import static com.project.demo.data.PathConstantData.API_CURRENT_USER_PAYMENTS_CAPTURE;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,19 +30,23 @@ public class PaymentController {
     @Value("${frontend.url}")
     private String frontendUrl;
 
+    /*
+     * POST method
+     */
+
     @PostMapping(API_CURRENT_USER_PAYMENTS)
     public ResponseEntity<PaymentResponseDTO> createPayment(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody PaymentRequestDTO dto) {
-        PaymentResponseDTO response = paymentService.createPayment(dto);
+        PaymentResponseDTO responseDTO = paymentService.createPayment(dto);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseDTO);
     }
 
     @PostMapping(API_CURRENT_USER_PAYMENTS_CAPTURE)
     public ResponseEntity<PaymentCaptureResponseDTO> capturePayment(@Valid @RequestBody PaymentGatewayRequestDTO requestDTO) {
-        PaymentCaptureResponseDTO response = paymentService.capturePayment(requestDTO);
+        PaymentCaptureResponseDTO responseDTO = paymentService.capturePayment(requestDTO);
         
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseDTO);
     }
 }

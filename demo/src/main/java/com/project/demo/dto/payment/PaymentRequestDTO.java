@@ -10,7 +10,7 @@ public record PaymentRequestDTO(
         @NotNull(message = "Payment method is required!")
         PaymentMethod method,
         
-        // ===== 關聯 =====
+        // ===== Relation =====
         @NotNull(message = "Order UUID is required!")
         UUID orderUuid) {
 }

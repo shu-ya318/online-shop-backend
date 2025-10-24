@@ -17,7 +17,7 @@ public record UserRegisterRequestDTO(
 
 	@NotBlank(message = "Password is required!") 
 	@Size(min = 8, max = 20,  message = "Password must be 8-20 characters long!") 
-	String password, // 未加密
+	String password, // Unencrypted
 
 	@NotBlank(message = "Phone number is required!") 
 	@Size(min = 10, max = 10, message = "Phone number must be 10 digits!")

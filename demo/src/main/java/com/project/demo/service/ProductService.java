@@ -38,16 +38,18 @@ public class ProductService {
 
 		Page<Product> productPage = productRepository.findAll(specification, pageable);
 
-		List<ProductResponseDTO> productDTOs = productMapper.toResponseDTOs(productPage.getContent()).stream()
+		List<ProductResponseDTO> productDTO = productMapper.toResponseDTOs(productPage.getContent()).stream()
 				.map(this::updateAvailabilityByStock)
 				.toList();
 
-		return new PaginatedResponse<>(
-				productDTOs,
+		PaginatedResponse<ProductResponseDTO> responseDTO = new PaginatedResponse<>(
+				productDTO,
 				productPage.getNumber(),
 				productPage.getSize(),
 				productPage.getTotalElements(),
 				productPage.getTotalPages());
+
+		return responseDTO;
 	}
 
 	// Get product by uuid
@@ -55,9 +57,11 @@ public class ProductService {
 		Product product = productRepository.findByUuid(uuid)
 				.orElseThrow(() -> new EntityNotFoundException("Product not found with uuid: " + uuid));
 
-		ProductResponseDTO dto = productMapper.toProductResponseDTO(product);
+		ProductResponseDTO productDTO = productMapper.toProductResponseDTO(product);
 
-		return updateAvailabilityByStock(dto);
+		ProductResponseDTO responseDTO = updateAvailabilityByStock(productDTO);
+
+		return responseDTO;
 	}
 
 	// Record Sale
@@ -111,9 +115,9 @@ public class ProductService {
 		boolean shouldUpdateToOutOfStock = dto.stock() != null
 				&& dto.stock() <= 0
 				&& dto.availabilityStatus() != AvailabilityStatus.OUT_OF_STOCK;
-
+		
 		if (shouldUpdateToOutOfStock) {
-			return new ProductResponseDTO(
+			ProductResponseDTO responseDTO = new ProductResponseDTO(
 					dto.uuid(),
 					dto.name(),
 					AvailabilityStatus.OUT_OF_STOCK,
@@ -126,6 +130,8 @@ public class ProductService {
 					dto.stock(),
 					dto.totalSold(),
 					dto.imageUrl());
+
+			return responseDTO;
 		}
 
 		return dto;

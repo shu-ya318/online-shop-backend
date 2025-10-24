@@ -1,6 +1,7 @@
 package com.project.demo.model;
 
 import java.math.BigDecimal;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
@@ -22,27 +23,26 @@ import lombok.ToString;
 @ToString(exclude = { "order", "product" })
 public class OrderItem implements Sellable {
 
-    // ===== 主鍵 =====
+    // ===== Primary Key =====
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_item_id")
     private Long id;
 
-    // ===== 關聯 =====
+    // ===== Relation =====
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    // 不是關聯cart
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_uuid", referencedColumnName = "uuid", nullable = false)
     private Product product;
 
-    // ===== 基本資訊 =====
+    // ===== Basic Information =====
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
-    // ===== 下單時的產品資訊快照 =====
+    // ===== Product Info Snapshot =====
     @Column(name = "product_name", nullable = false, updatable = false)
     private String productName;
 

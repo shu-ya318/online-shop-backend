@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = { PaymentMapper.class,
 		PriceCalculationUtils.class })
 public interface OrderMapper {
-
     // --------- Order ---------
+
     @Mapping(target = "orderUuid", source = "uuid")
     @Mapping(target = "userUuid", source = "user.uuid")
     @Mapping(target = "total", source = "total")
@@ -47,38 +47,45 @@ public interface OrderMapper {
 
         PaymentMapper paymentMapper = Mappers.getMapper(PaymentMapper.class);
 
-        return payments.stream()
+        PaymentSummaryDTO latestPayment = payments.stream()
                 .max(Comparator.comparing(Payment::getCreatedAt))
                 .map(paymentMapper::toPaymentSummaryDTO)
                 .orElse(null);
+
+        return latestPayment;
     }
 
     // --------- OrderItem ---------
+
     @Named("toOrderItemDTOs")
     default List<OrderItemDTO> toOrderItemDTOs(Set<OrderItem> items) {
-        if (items == null)
+        if (items == null) {
             return Collections.emptyList();
+        }
 
         ProductMapper productMapper = Mappers.getMapper(ProductMapper.class);
 
-        return items.stream()
+        List<OrderItemDTO> dtoList = items.stream()
                 .sorted((item1, item2) -> Long.compare(item1.getId(), item2.getId()))
                 .map(item -> toOrderItemDTO(item, productMapper))
                 .collect(Collectors.toList());
+
+        return dtoList;
     }
 
     default OrderItemDTO toOrderItemDTO(OrderItem orderItem, ProductMapper productMapper) {
         Product product = orderItem.getProduct();
 
-        if (product == null)
+        if (product == null) {
             return null;
+        }
 
         BigDecimal discountPrice = productMapper.calculateDiscountPrice(product);
         String imageUrl = product.getImageUrl() == null ? "" : product.getImageUrl();
         BigDecimal discountPercentage = product.getDiscountPercentage() == null ? BigDecimal.ZERO
                 : product.getDiscountPercentage();
 
-        return new OrderItemDTO(
+        OrderItemDTO orderItemDTO = new OrderItemDTO(
                 product.getName(),
                 product.getPrice(),
                 discountPercentage,
@@ -86,5 +93,7 @@ public interface OrderMapper {
                 imageUrl,
                 orderItem.getQuantity(),
                 product.getUuid());
+
+        return orderItemDTO;
     }
 }

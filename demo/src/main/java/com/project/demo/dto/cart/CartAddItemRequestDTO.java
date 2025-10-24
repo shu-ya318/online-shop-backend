@@ -8,6 +8,6 @@ import jakarta.validation.constraints.NotNull;
 public record CartAddItemRequestDTO(
         @NotNull @Min(1) Integer quantity,
 
-        // ===== 關聯 =====
+        // ===== Relation =====
         @NotNull UUID productUuid) {
 }

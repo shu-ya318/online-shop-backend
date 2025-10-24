@@ -6,11 +6,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 public record OrderItemCreateRequestDTO(
-        @NotNull 
-        @Min(1) 
-        Integer quantity,
-        
-        // ===== 關聯 =====
-        @NotNull 
-        UUID productUuid) {
+        @NotNull @Min(1) Integer quantity,
+
+        // ===== Relation =====
+        @NotNull UUID productUuid) {
 }

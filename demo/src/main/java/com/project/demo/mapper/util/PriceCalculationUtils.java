@@ -17,29 +17,34 @@ public class PriceCalculationUtils {
     @Named("calculateSubtotal")
     public static BigDecimal calculateSubtotal(Set<? extends Sellable> items) {
         if (items == null || items.isEmpty()) {
-            return BigDecimal.ZERO.setScale(0, RoundingMode.HALF_UP);
+            BigDecimal zero = BigDecimal.ZERO.setScale(0, RoundingMode.HALF_UP);
+            return zero;
         }
 
         ProductMapper productMapper = Mappers.getMapper(ProductMapper.class);
 
-        return items.stream()
+        BigDecimal subtotal = items.stream()
                 .map(item -> {
                     BigDecimal discountPrice = productMapper.calculateDiscountPrice(item.getProduct());
                     return discountPrice.multiply(new BigDecimal(item.getQuantity()));
                 })
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .setScale(0, RoundingMode.HALF_UP);
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal result = subtotal.setScale(0, RoundingMode.HALF_UP);
+        return result;
     }
 
     @Named("calculateShipping")
     public static BigDecimal calculateShipping(Set<? extends Sellable> items) {
         BigDecimal subtotal = calculateSubtotal(items);
+        BigDecimal shippingFee;
 
         if (subtotal.compareTo(new BigDecimal("300")) >= 0) {
-            return BigDecimal.ZERO.setScale(0, RoundingMode.HALF_UP);
+            shippingFee = BigDecimal.ZERO.setScale(0, RoundingMode.HALF_UP);
         } else {
-            return SHIPPING_FEE;
+            shippingFee = SHIPPING_FEE;
         }
+        return shippingFee;
     }
 
     @Named("calculateTotal")
@@ -47,17 +52,19 @@ public class PriceCalculationUtils {
         BigDecimal subtotal = calculateSubtotal(items);
         BigDecimal shipping = calculateShipping(items);
 
-        return subtotal.add(shipping).setScale(0, RoundingMode.HALF_UP);
+        BigDecimal total = subtotal.add(shipping);
+        BigDecimal result = total.setScale(0, RoundingMode.HALF_UP);
+        return result;
     }
 
     @Named("calculateTotalQuantity")
     public static Integer calculateTotalQuantity(Set<? extends Sellable> items) {
-        if (items == null) {
-            return 0;
+        Integer totalQuantity = 0;
+        if (items != null) {
+            totalQuantity = items.stream()
+                    .mapToInt(Sellable::getQuantity)
+                    .sum();
         }
-
-        return items.stream()
-                .mapToInt(Sellable::getQuantity)
-                .sum();
+        return totalQuantity;
     }
 }

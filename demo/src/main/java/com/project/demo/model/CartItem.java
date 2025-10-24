@@ -21,13 +21,13 @@ import lombok.ToString;
 @ToString(exclude = {"cart", "product"})
 public class CartItem implements Sellable {
 
-    // ===== 主鍵 =====
+    // ===== Primary Key =====
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cart_item_id")
     private Long id;
 
-    // ===== 關聯 =====
+    // ===== Relation =====
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
@@ -36,7 +36,7 @@ public class CartItem implements Sellable {
     @JoinColumn(name = "product_uuid", referencedColumnName = "uuid", nullable = false)
     private Product product;
 
-    // ===== 基本資訊 =====
+    // ===== Basic Information =====
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 }

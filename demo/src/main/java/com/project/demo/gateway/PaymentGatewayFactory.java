@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import com.project.demo.enumeration.PaymentMethod;
 
-// 呼叫端只需提供paymentMethod，就能取得 對應的PaymentGateway實例
 @Component
 public class PaymentGatewayFactory {
 

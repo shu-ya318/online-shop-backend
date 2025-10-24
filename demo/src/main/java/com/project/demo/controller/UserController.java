@@ -13,6 +13,7 @@ import com.project.demo.dto.user.UserUpdateRequestDTO;
 import com.project.demo.service.UserService;
 
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 
 import java.security.Principal;
@@ -45,9 +46,9 @@ public class UserController {
 
     @PostMapping(API_LOGIN)
     public ResponseEntity<UserLoginResponseDTO> login(@Valid @RequestBody UserLoginRequestDTO dto) {
-        UserLoginResponseDTO response = userService.login(dto);
+        UserLoginResponseDTO responseDTO = userService.login(dto);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseDTO);
     }
 
     @PostMapping(API_REFRESH_TOKEN)
@@ -59,30 +60,32 @@ public class UserController {
 
     @PostMapping(API_OAUTH2_EXCHANGE_CODE)
     public ResponseEntity<UserLoginResponseDTO> exchangeOAuth2Code(@Valid @RequestBody OAuth2CodeRequestDTO dto) {
-        UserLoginResponseDTO response = userService.exchangeOAuth2Code(dto.oauth2Code());
+        UserLoginResponseDTO responseDTO = userService.exchangeOAuth2Code(dto.oauth2Code());
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseDTO);
     }
 
     /*
      * GET method
      */
+
     @GetMapping(API_CURRENT_USER)
     public ResponseEntity<UserResponseDTO> getCurrentUser(Principal principal) {
-        UserResponseDTO response = userService.getUserResponseDTOByEmail(principal.getName());
+        UserResponseDTO responseDTO = userService.getUserResponseDTOByEmail(principal.getName());
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseDTO);
     }
 
     /*
-     * PUT
+     * PUT method
      */
+
     @PutMapping(API_UPDATE_USER)
     public ResponseEntity<UserResponseDTO> updateUser(Principal principal,
             @Valid @RequestBody UserUpdateRequestDTO dto) {
-        UserResponseDTO response = userService.updateUser(principal.getName(), dto);
+        UserResponseDTO responseDTO = userService.updateUser(principal.getName(), dto);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseDTO);
     }
 
     @PutMapping(API_UPDATE_PASSWORD)

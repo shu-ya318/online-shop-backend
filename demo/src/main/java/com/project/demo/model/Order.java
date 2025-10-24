@@ -39,13 +39,13 @@ import lombok.ToString;
 @ToString
 public class Order {
 
-    // ===== 主鍵 =====
+    // ===== Primary Key =====
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
     private Long id;
 
-    // ===== 基本資訊 =====
+    // ===== Basic Information =====
     @Column(name = "uuid", nullable = false, unique = true, updatable = false)
     private UUID uuid;
 
@@ -53,7 +53,7 @@ public class Order {
     @Column(name = "status", nullable = false)
     private OrderStatus status;
 
-    // ===== 關聯 =====
+    // ===== Relation =====
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_uuid", referencedColumnName = "uuid", nullable = false)
     private User user;
@@ -64,7 +64,7 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Payment> payments = new ArrayList<>();
 
-    // ===== 收件人資訊 =====
+    // ===== Recipient Info =====
     @Column(name = "recipient_name", nullable = false)
     private String recipientName;
 
@@ -74,15 +74,15 @@ public class Order {
     @Column(name = "recipient_address", nullable = false, length = 255)
     private String recipientAddress;
 
-    // ===== 其他資訊 =====
+    // ===== Other Info =====
     @Column(name = "order_notes")
     private String orderNotes;
 
-    // ===== 金額資訊 =====
+    // ===== Amount Info =====
     @Column(name = "total", nullable = false, precision = 10, scale = 0)
     private BigDecimal total;
 
-    // ===== 審計欄位 =====
+    // ===== Audit Fields =====
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

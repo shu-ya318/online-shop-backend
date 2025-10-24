@@ -31,13 +31,13 @@ import lombok.ToString;
 @ToString
 public class Payment {
 
-    // ===== 主鍵 =====
+    // ===== Primary Key =====
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_id")
     private Long id;
 
-    // ===== 基本資訊 =====
+    // ===== Basic Info =====
     @Column(name = "uuid", nullable = false, unique = true, updatable = false)
     private UUID uuid;
 
@@ -58,12 +58,12 @@ public class Payment {
     @Column(name = "currency", nullable = false, length = 3)
     private String currency;
 
-    // ===== 關聯 =====
+    // ===== Relation =====
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_uuid", referencedColumnName = "uuid", nullable = false)
     private Order order;
 
-    // ===== 審計欄位 =====
+    // ===== Audit Fields =====
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

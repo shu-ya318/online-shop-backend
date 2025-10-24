@@ -14,16 +14,18 @@ public class RedisService {
  private final StringRedisTemplate redisTemplate;
 
  // ===== JWT =====
+
  public void saveRefreshToken(String userId, String refreshToken, long duration, TimeUnit unit) {
   redisTemplate.opsForValue().set("refresh:" + userId, refreshToken, duration, unit);
  }
  
  public String getRefreshToken(String userId) {
-  return redisTemplate.opsForValue().get("refresh:" + userId);
+  String refreshToken = redisTemplate.opsForValue().get("refresh:" + userId);
+  return refreshToken;
  }
- // 登出或強制失效時
+ // When logout or force invalidation
  public void deleteRefreshToken(String userId) {
-  redisTemplate.delete("refresh:" + userId);
+  redisTemplate.delete("refresh_token:" + userId);
  }
  
  public void blacklistToken(String token, long duration, TimeUnit unit) {
@@ -31,55 +33,60 @@ public class RedisService {
  }
 
  public boolean isTokenBlacklisted(String token) {
-  return redisTemplate.hasKey("blacklist:" + token);
+  boolean isBlacklisted = redisTemplate.hasKey("blacklist:" + token);
+  return isBlacklisted;
  }
 
-  // ===== OAuth2 授權碼 ===== 
+  // ===== OAuth2 Authorization Code ===== 
   public void saveOAuth2AuthCode(String oauth2Code, String userId, long duration, TimeUnit unit) {
     redisTemplate.opsForValue().set("oauth2authcode:" + oauth2Code, userId, duration, unit);
    }
   
    public String getOAuth2AuthCode(String oauth2Code) {
-    return redisTemplate.opsForValue().get("oauth2authcode:" + oauth2Code);
+    String authCode = redisTemplate.opsForValue().get("oauth2authcode:" + oauth2Code);
+    return authCode;
    }
   
    public void deleteOAuth2AuthCode(String oauth2Code) {
     redisTemplate.delete("oauth2authcode:" + oauth2Code);
    }
 
- // ===== 帳號啟動碼 ===== 
+ // ===== TODO: Account Activation Code ===== 
  public void saveActivationCode(String email, String code) {
   redisTemplate.opsForValue().set("activation:" + email, code, 15, TimeUnit.MINUTES);
  }
 
  public String getActivationCode(String email) {
-  return redisTemplate.opsForValue().get("activation:" + email);
+  String activationCode = redisTemplate.opsForValue().get("activation:" + email);
+  return activationCode;
  }
 
  public void deleteActivationCode(String email) {
   redisTemplate.delete("activation:" + email);
  }
 
- // ===== 密碼重置碼 ===== 
+ // ===== TODO: Password Reset Code ===== 
  public void savePasswordResetCode(String email, String code) {
   redisTemplate.opsForValue().set("pwdreset:" + email, code, 15, TimeUnit.MINUTES);
  }
 
  public String getPasswordResetCode(String email) {
-  return redisTemplate.opsForValue().get("pwdreset:" + email);
+  String resetCode = redisTemplate.opsForValue().get("pwdreset:" + email);
+  return resetCode;
  }
 
  public void deletePasswordResetCode(String email) {
   redisTemplate.delete("pwdreset:" + email);
  }
 
- // ===== 2FA 驗證碼 ===== 
+ // ===== TODO: 2FA Verification Code ===== 
  public void saveTwoFactorCode(String email, String code) {
   redisTemplate.opsForValue().set("2fa:" + email, code, 5, TimeUnit.MINUTES);
  }
 
  public String getTwoFactorCode(String email) {
-  return redisTemplate.opsForValue().get("2fa:" + email);
+  String twoFactorCode = redisTemplate.opsForValue().get("2fa:" + email);
+  return twoFactorCode;
  }
 
  public void deleteTwoFactorCode(String email) {
@@ -90,21 +97,21 @@ public class RedisService {
   String key = "failedlogin:" + email;
   Long count = redisTemplate.opsForValue().increment(key);
   if (count != null && count == 1) {
-   // 第一次失敗時設定過期時間，1 小時後自動清除
    redisTemplate.expire(key, 1, TimeUnit.HOURS);
   }
  }
 
  public int getFailedLoginAttempts(String email) {
   String val = redisTemplate.opsForValue().get("failedlogin:" + email);
-  return val == null ? 0 : Integer.parseInt(val);
+  int attempts = val == null ? 0 : Integer.parseInt(val);
+  return attempts;
  }
 
  public void resetFailedLoginAttempts(String email) {
   redisTemplate.delete("failedlogin:" + email);
  }
 
- // ===== 帳號鎖定時間 ===== 
+ // ===== TODO: Account Lock Until ===== 
  public void setAccountLockUntil(String email, long timestamp) {
   redisTemplate.opsForValue().set("lockuntil:" + email, String.valueOf(timestamp), 1, TimeUnit.HOURS);
  }
@@ -114,7 +121,8 @@ public class RedisService {
   if (val == null)
    return null;
   try {
-   return Long.parseLong(val);
+   Long lockUntil = Long.parseLong(val);
+   return lockUntil;
   } catch (NumberFormatException e) {
    return null;
   }

@@ -75,6 +75,7 @@ public class SecurityConfig {
                                                 .requestMatchers(API_PUBLIC_ALL)
                                                 .permitAll()
                                                 .anyRequest().authenticated());
+
                 return http.build();
         }
 
