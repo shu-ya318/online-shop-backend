@@ -152,16 +152,21 @@
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>
 		</dependency>
 
-		<!-- Redis -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-redis</artifactId>
-		</dependency>
-		<!-- Redis Client -->
-		<dependency>
-			<groupId>io.lettuce</groupId>
-			<artifactId>lettuce-core</artifactId>
-		</dependency>
+	<!-- Redis -->
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-data-redis</artifactId>
+	</dependency>
+	<!-- Redis Client -->
+	<dependency>
+		<groupId>io.lettuce</groupId>
+		<artifactId>lettuce-core</artifactId>
+	</dependency>
+	<!-- Spring Session Redis for OAuth2 session storage -->
+	<dependency>
+		<groupId>org.springframework.session</groupId>
+		<artifactId>spring-session-data-redis</artifactId>
+	</dependency>
 
 		<!-- Validation -->
 		<dependency>

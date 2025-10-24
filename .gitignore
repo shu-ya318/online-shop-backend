@@ -41,5 +41,6 @@ build/
 
 ### VS Code ###
 .vscode/
+.history/
 
 application-*.properties

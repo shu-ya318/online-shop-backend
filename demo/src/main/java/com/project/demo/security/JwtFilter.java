@@ -18,7 +18,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -29,7 +31,9 @@ public class JwtFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     private static final List<String> PUBLIC_PATHS = Arrays.asList(
-            "/public/**");
+            "/public/**",
+            "/oauth2/**",
+            "/login/oauth2/**");
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 

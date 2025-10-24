@@ -1,6 +1,7 @@
 package com.project.demo.config;
 
 import java.util.List;
+import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.http.HttpStatus;
 
 import com.project.demo.security.OAuth2AuthSuccessHandler;
 import com.project.demo.security.LogoutResultHandler;
@@ -21,8 +24,14 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.core.AuthenticationException;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static com.project.demo.data.PathConstantData.API_PUBLIC_ALL;
@@ -53,7 +62,7 @@ public class SecurityConfig {
                                 })
                                 .csrf(csrf -> csrf.disable())
                                 .sessionManagement(session -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                                 .oauth2Login(oauth2 -> oauth2
                                                 .successHandler(oAuth2AuthSuccessHandler))
                                 .logout(logout -> logout.logoutUrl(API_LOGOUT)
