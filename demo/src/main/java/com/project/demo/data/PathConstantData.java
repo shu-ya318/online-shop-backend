@@ -8,11 +8,10 @@ public class PathConstantData {
 	/* PUBLIC */
 	public static final String API_PUBLIC = "/public";
 	public static final String[] API_PUBLIC_ALL = new String[] {
-			"/v3/api-docs/**",
-			"/swagger-ui/**",
-			"/oauth2/**",
 			"/public/**",
-			"/actuator/**"
+			"/login/oauth2/**",
+			"/oauth2/**",
+			"/actuator/**",
 	};
 
 	/* USERS */

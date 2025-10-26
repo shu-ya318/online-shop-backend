@@ -34,6 +34,8 @@ import jakarta.servlet.ServletException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+
 import static com.project.demo.data.PathConstantData.API_PUBLIC_ALL;
 import static com.project.demo.data.PathConstantData.API_DNS;
 import static com.project.demo.data.PathConstantData.API_LOGOUT;
@@ -43,40 +45,44 @@ import static com.project.demo.data.PathConstantData.API_LOGOUT;
 public class SecurityConfig {
 
         private final JwtFilter jwtFilter;
+
         private final OAuth2AuthSuccessHandler oAuth2AuthSuccessHandler;
+        
         private final LogoutResultHandler logoutResultHandler;
 
         @Value("${frontend.url}")
         private String frontendUrl;
 
         @Bean
-        public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
-                        throws Exception {
-                return authenticationConfiguration.getAuthenticationManager();
+        SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+                http
+                        .cors(cors -> {
+                        })
+                        .csrf(csrf -> csrf.disable())
+                        .sessionManagement(session -> session
+                                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                        .oauth2Login(oauth2 -> oauth2
+                                        .successHandler(oAuth2AuthSuccessHandler))
+                        .logout(logout -> logout.logoutUrl(API_LOGOUT)
+                                        .logoutSuccessHandler(logoutResultHandler)
+                                        .clearAuthentication(true))
+                        .exceptionHandling(exceptions -> exceptions
+                                        .authenticationEntryPoint(customAuthenticationEntryPoint()))
+                        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                        .authorizeHttpRequests(authorize -> authorize
+                                        .requestMatchers(API_PUBLIC_ALL).permitAll()
+                                        .anyRequest().authenticated());
+
+                return http.build();
         }
 
         @Bean
-        SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-                http
-                                .cors(cors -> {
-                                })
-                                .csrf(csrf -> csrf.disable())
-                                .sessionManagement(session -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                                .oauth2Login(oauth2 -> oauth2
-                                                .successHandler(oAuth2AuthSuccessHandler))
-                                .logout(logout -> logout.logoutUrl(API_LOGOUT)
-                                                .logoutSuccessHandler(logoutResultHandler)
-                                                .clearAuthentication(true))
-                                .exceptionHandling(exceptions -> exceptions
-                                                .authenticationEntryPoint(customAuthenticationEntryPoint()))
-                                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                                .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers(API_PUBLIC_ALL)
-                                                .permitAll()
-                                                .anyRequest().authenticated());
-
-                return http.build();
+        public FilterRegistrationBean<JwtFilter> jwtFilterRegistration(JwtFilter jwtFilter) {
+                FilterRegistrationBean<JwtFilter> registration = new FilterRegistrationBean<>(jwtFilter);
+        
+                registration.setEnabled(false);
+                
+                return registration;
         }
 
         @Bean
@@ -95,6 +101,12 @@ public class SecurityConfig {
                 source.registerCorsConfiguration("/**", config);
 
                 return source;
+        }
+
+        @Bean
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+                        throws Exception {
+                return authenticationConfiguration.getAuthenticationManager();
         }
 
         @Bean

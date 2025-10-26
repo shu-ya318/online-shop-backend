@@ -1,5 +1,7 @@
 package com.project.demo.security;
 
+import com.project.demo.data.PathConstantData;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Component;
@@ -9,8 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -31,23 +33,29 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userDetailsService;
 
-    private static final List<String> PUBLIC_PATHS = Arrays.asList(
-            "/public/**",
-            "/oauth2/**",
-            "/login/oauth2/**");
-
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
+    @Override
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) throws ServletException {
+        String path = request.getServletPath();
+
+        if (path.startsWith("/api")) {
+            path = path.substring(4);
+        }
+
+        final String finalPath = path;
+
+        boolean isPublicPath = Arrays.stream(PathConstantData.API_PUBLIC_ALL)
+                .anyMatch(pathPattern -> pathMatcher.match(pathPattern, finalPath));
+        
+        return isPublicPath;
+    }
 
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
-
-        if (isPublicPath(request.getRequestURI())) {
-            filterChain.doFilter(request, response);
-            return;
-        }
 
         String bearerToken = request.getHeader("Authorization");
 
@@ -76,16 +84,5 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private boolean isPublicPath(String requestUri) {
-        String path = requestUri;
-        if (path.startsWith("/api")) {
-            path = path.substring(4);
-        }
-
-        final String finalPath = path;
-        
-        return PUBLIC_PATHS.stream().anyMatch(p -> pathMatcher.match(p, finalPath));
     }
 }
