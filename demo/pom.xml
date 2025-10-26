@@ -77,7 +77,7 @@
 			<optional>true</optional>
 		</dependency>
 
-		<!-- JAVA -->
+		<!-- Spring Data JPA -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -156,11 +156,6 @@
 	<dependency>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-data-redis</artifactId>
-	</dependency>
-	<!-- Redis Client -->
-	<dependency>
-		<groupId>io.lettuce</groupId>
-		<artifactId>lettuce-core</artifactId>
 	</dependency>
 	<!-- Spring Session Redis for OAuth2 session storage -->
 	<dependency>
