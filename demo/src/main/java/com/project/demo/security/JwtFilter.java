@@ -30,9 +30,7 @@ import java.util.stream.Collectors;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-
     private final UserDetailsService userDetailsService;
-
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override

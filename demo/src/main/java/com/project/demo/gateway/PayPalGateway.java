@@ -47,21 +47,23 @@ public class PayPalGateway implements PaymentGateway {
     @Override
     public PaymentGatewayResponseDTO createPayment(Payment payment) {
         try {
+            // Parameter: payer
             Payer payer = new Payer();
             payer.setPaymentMethod("paypal");
 
+            // Parameter: redirectUrls
             String orderUuid = payment.getOrder().getUuid().toString();
-
             RedirectUrls redirectUrls = new RedirectUrls();
             redirectUrls.setReturnUrl(frontendUrl + "/order");
             redirectUrls
                     .setCancelUrl(frontendUrl + "/order?status=" + PaymentStatus.CANCELLED + "&orderUuid=" + orderUuid);
 
-            // Create payment amount
+            // Parameter: amount
             Amount amount = new Amount();
             amount.setTotal(payment.getAmount().toPlainString());
             amount.setCurrency(payment.getCurrency());
 
+            // Parameter: transaction
             Transaction transaction = new Transaction();
             transaction.setAmount(amount);
             transaction.setDescription("Payment for order " + payment.getOrder().getUuid());
@@ -69,7 +71,7 @@ public class PayPalGateway implements PaymentGateway {
             List<Transaction> transactions = new ArrayList<>();
             transactions.add(transaction);
 
-            // Assemble complete request information
+            // Assemble complete request parameters: requestPayment
             com.paypal.api.payments.Payment requestPayment = new com.paypal.api.payments.Payment();
 
             requestPayment.setIntent("sale");
@@ -80,10 +82,11 @@ public class PayPalGateway implements PaymentGateway {
             // Send request authorization request
             com.paypal.api.payments.Payment createdPayment = requestPayment.create(getAPIContext());
 
-            String approvalUrl = getApprovalUrl(createdPayment)
-                    .orElseThrow(() -> new IllegalStateException("Could not find approval URL"));
-
+            // Assemble complete response parameters
             String paymentId = createdPayment.getId();
+
+            String approvalUrl = getApprovalUrl(createdPayment)
+                    .orElseThrow(() -> new IllegalStateException("Could not find approval URL!"));
 
             return new PaymentGatewayResponseDTO(paymentId, PaymentStatus.AUTHORIZED, approvalUrl);
 
@@ -126,7 +129,8 @@ public class PayPalGateway implements PaymentGateway {
         return PaymentMethod.PAYPAL;
     }
 
-    // -- Helper Methods --
+	// ----- Private Helper Method -----
+
     private Optional<String> getApprovalUrl(com.paypal.api.payments.Payment payment) {
         return payment.getLinks().stream()
                 .filter(link -> "approval_url".equalsIgnoreCase(link.getRel()))

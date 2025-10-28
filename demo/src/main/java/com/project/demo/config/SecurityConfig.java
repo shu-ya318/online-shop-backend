@@ -45,9 +45,7 @@ import static com.project.demo.data.PathConstantData.API_LOGOUT;
 public class SecurityConfig {
 
         private final JwtFilter jwtFilter;
-
         private final OAuth2AuthSuccessHandler oAuth2AuthSuccessHandler;
-        
         private final LogoutResultHandler logoutResultHandler;
 
         @Value("${frontend.url}")

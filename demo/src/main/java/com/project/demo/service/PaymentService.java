@@ -57,10 +57,10 @@ public class PaymentService {
                                 .orElseThrow(() -> new OperationNotSupportedException(
                                                 "Payment method not supported: " + dto.method()));
 
-                PaymentGatewayResponseDTO gatewayResponse = gateway.createPayment(payment);
+                PaymentGatewayResponseDTO gatewayResponseDTO = gateway.createPayment(payment);
                 // Choose payment method, write the initialized transactionId and status
-                payment.setTransactionId(gatewayResponse.transactionId());
-                payment.setStatus(gatewayResponse.status());
+                payment.setTransactionId(gatewayResponseDTO.transactionId());
+                payment.setStatus(gatewayResponseDTO.status());
 
                 paymentRepository.save(payment);
 
@@ -83,7 +83,7 @@ public class PaymentService {
                                 responseDTO.currency(),
                                 responseDTO.orderUuid(),
                                 // For external payment platforms
-                                gatewayResponse.redirectUrl());
+                                gatewayResponseDTO.redirectUrl());
 
                 return paymentResponseDTO;
         }
@@ -92,7 +92,7 @@ public class PaymentService {
         @Transactional
         public PaymentCaptureResponseDTO capturePayment(PaymentGatewayRequestDTO dto) {
                 Payment payment = paymentRepository.findByTransactionId(dto.paymentId())
-                                .orElseThrow(() -> new EntityNotFoundException(
+                             capturePayment   .orElseThrow(() -> new EntityNotFoundException(
                                                 "Payment not found with transactionId: " + dto.paymentId()));
 
                 PaymentGateway gateway = paymentGatewayFactory.getGateway(payment.getMethod())

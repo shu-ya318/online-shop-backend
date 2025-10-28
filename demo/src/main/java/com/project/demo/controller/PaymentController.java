@@ -37,8 +37,8 @@ public class PaymentController {
     @PostMapping(API_CURRENT_USER_PAYMENTS)
     public ResponseEntity<PaymentResponseDTO> createPayment(
             @AuthenticationPrincipal User user,
-            @Valid @RequestBody PaymentRequestDTO dto) {
-        PaymentResponseDTO responseDTO = paymentService.createPayment(dto);
+            @Valid @RequestBody PaymentRequestDTO requestDTO) {
+        PaymentResponseDTO responseDTO = paymentService.createPayment(requestDTO);
 
         return ResponseEntity.ok(responseDTO);
     }
