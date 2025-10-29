@@ -38,9 +38,7 @@ public class ProductService {
 
 		Page<Product> productPage = productRepository.findAll(specification, pageable);
 
-		List<ProductResponseDTO> productDTO = productMapper.toResponseDTOs(productPage.getContent()).stream()
-				.map(this::updateAvailabilityByStock)
-				.toList();
+		List<ProductResponseDTO> productDTO = productMapper.toResponseDTOs(productPage.getContent());
 
 		PaginatedResponse<ProductResponseDTO> responseDTO = new PaginatedResponse<>(
 				productDTO,
@@ -57,9 +55,7 @@ public class ProductService {
 		Product product = productRepository.findByUuid(uuid)
 				.orElseThrow(() -> new EntityNotFoundException("Product not found with uuid: " + uuid));
 
-		ProductResponseDTO productDTO = productMapper.toProductResponseDTO(product);
-
-		ProductResponseDTO responseDTO = updateAvailabilityByStock(productDTO);
+		ProductResponseDTO responseDTO = productMapper.toProductResponseDTO(product);
 
 		return responseDTO;
 	}
@@ -84,7 +80,7 @@ public class ProductService {
 		product.setTotalSold(product.getTotalSold() + quantity);
 		product.setUpdatedAt(LocalDateTime.now());
 
-		return product;
+		return productRepository.save(product);
 	}
 
 	// Release Stock
@@ -106,34 +102,5 @@ public class ProductService {
 			
 			productRepository.save(product);
 		}
-	}
-
-	// ----- Private Helper Method -----
-
-	// Update availability by stock
-	private ProductResponseDTO updateAvailabilityByStock(ProductResponseDTO dto) {
-		boolean shouldUpdateToOutOfStock = dto.stock() != null
-				&& dto.stock() <= 0
-				&& dto.availabilityStatus() != AvailabilityStatus.OUT_OF_STOCK;
-		
-		if (shouldUpdateToOutOfStock) {
-			ProductResponseDTO responseDTO = new ProductResponseDTO(
-					dto.uuid(),
-					dto.name(),
-					AvailabilityStatus.OUT_OF_STOCK,
-					dto.sku(),
-					dto.price(),
-					dto.discountPercentage(),
-					dto.discountPrice(),
-					dto.description(),
-					dto.category(),
-					dto.stock(),
-					dto.totalSold(),
-					dto.imageUrl());
-
-			return responseDTO;
-		}
-
-		return dto;
 	}
 }
