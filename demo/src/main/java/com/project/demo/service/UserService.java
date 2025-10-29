@@ -80,6 +80,7 @@ public class UserService {
     }
 
     // Login
+    @Transactional
     public UserLoginResponseDTO login(UserLoginRequestDTO dto) {
         User user = userRepository.findByEmail(dto.email())
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password!"));
@@ -101,9 +102,9 @@ public class UserService {
 
         // Handle token, provide to client
         var roles = user.getUserRoles().stream().map(Enum::name).collect(Collectors.toSet());
-
         String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUuid(), user.getEmail(),
                 roles);
+
         String refreshToken = jwtUtil.generateRefreshToken(user.getUuid());
 
         redisService.saveRefreshToken(user.getUuid().toString(), refreshToken, jwtUtil.getRefreshTokenExpiration(),
@@ -140,8 +141,8 @@ public class UserService {
         }
 
         var roles = user.getUserRoles().stream().map(Enum::name).collect(Collectors.toSet());
-
         String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUuid(), user.getEmail(), roles);
+        
         String refreshToken = jwtUtil.generateRefreshToken(user.getUuid());
 
         redisService.saveRefreshToken(user.getUuid().toString(), refreshToken, jwtUtil.getRefreshTokenExpiration(),
@@ -160,9 +161,9 @@ public class UserService {
         return responseDTO;
     }
 
-    // Refresh Token
+    // Refresh Access Token
     @Transactional
-    public String refreshToken() {
+    public String refreshAccessToken() {
         String refreshToken = null;
 
         if (request.getCookies() != null) {

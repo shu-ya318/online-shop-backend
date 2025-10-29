@@ -29,7 +29,6 @@ public class JwtUtil {
 	private long refreshTokenExpiration;
 
 	private final SecretKey key;
-
 	private final StringRedisTemplate redisTemplate;
 
 	public JwtUtil(@Value("${jwt.secret}") String secret,
@@ -40,6 +39,7 @@ public class JwtUtil {
 			if (secret == null || secret.trim().isEmpty()) {
 				throw new IllegalArgumentException("JWT secret is empty");
 			}
+
 			this.key = Keys.hmacShaKeyFor(secret.getBytes());
 			this.accessTokenExpiration = accessTokenExpiration;
 			this.refreshTokenExpiration = refreshTokenExpiration;

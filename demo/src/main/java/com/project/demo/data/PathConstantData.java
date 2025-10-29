@@ -19,7 +19,7 @@ public class PathConstantData {
 	public static final String API_LOGIN = "/public/users/login";
 	public static final String API_OAUTH2_EXCHANGE_CODE = "/public/users/oauth2/exchange-code";
 	public static final String API_LOGOUT = "/public/users/logout";
-	public static final String API_REFRESH_TOKEN = "/public/users/refresh-token";
+	public static final String API_REFRESH_ACCESS_TOKEN = "/public/users/refresh-access-token";
 	public static final String API_CURRENT_USER = "/users/me";
 	public static final String API_UPDATE_USER = "/users/me/profile";
 	public static final String API_UPDATE_PASSWORD = "/users/me/password";

@@ -24,7 +24,7 @@ import static com.project.demo.data.PathConstantData.API_LOGIN;
 import static com.project.demo.data.PathConstantData.API_CURRENT_USER;
 import static com.project.demo.data.PathConstantData.API_UPDATE_USER;
 import static com.project.demo.data.PathConstantData.API_UPDATE_PASSWORD;
-import static com.project.demo.data.PathConstantData.API_REFRESH_TOKEN;
+import static com.project.demo.data.PathConstantData.API_REFRESH_ACCESS_TOKEN;
 import static com.project.demo.data.PathConstantData.API_OAUTH2_EXCHANGE_CODE;
 
 @RestController
@@ -51,9 +51,9 @@ public class UserController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @PostMapping(API_REFRESH_TOKEN)
-    public ResponseEntity<Map<String, String>> refreshToken() {
-        String accessToken = userService.refreshToken();
+    @PostMapping(API_REFRESH_ACCESS_TOKEN)
+    public ResponseEntity<Map<String, String>> refreshAccessToken() {
+        String accessToken = userService.refreshAccessToken();
 
         return ResponseEntity.ok(Map.of("accessToken", accessToken));
     }

@@ -92,7 +92,7 @@ public class PaymentService {
         @Transactional
         public PaymentCaptureResponseDTO capturePayment(PaymentGatewayRequestDTO dto) {
                 Payment payment = paymentRepository.findByTransactionId(dto.paymentId())
-                             capturePayment   .orElseThrow(() -> new EntityNotFoundException(
+                                .orElseThrow(() -> new EntityNotFoundException(
                                                 "Payment not found with transactionId: " + dto.paymentId()));
 
                 PaymentGateway gateway = paymentGatewayFactory.getGateway(payment.getMethod())
