@@ -1,13 +1,13 @@
 package com.project.demo.model;
 
 import java.util.UUID;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.project.demo.enumeration.AccountStatus;
 import com.project.demo.enumeration.AuthProvider;
 import com.project.demo.enumeration.Role;
+import com.project.demo.enumeration.Modifier;
 
 import jakarta.persistence.*;
 
@@ -79,13 +80,13 @@ public class User implements UserDetails {
     private LocalDateTime createdAt;
 
     @Column(name = "created_by", nullable = false, updatable = false, length = 50)
-    private String createdBy;
+    private Modifier createdBy;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Column(name = "updated_by", length = 50)
-    private String updatedBy;
+    private Modifier updatedBy;
 
     // ===== Login Info =====
     @Column(name = "last_login_at")
