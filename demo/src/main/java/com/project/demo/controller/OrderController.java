@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 
 import static com.project.demo.data.PathConstantData.API_CURRENT_USER_ORDERS;
 import static com.project.demo.data.PathConstantData.API_CURRENT_USER_ORDER_BY_UUID;
-import static com.project.demo.data.PathConstantData.API_CURRENT_USER_ORDER_CANCEL_BY_UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -68,21 +67,21 @@ public class OrderController {
     @GetMapping(API_CURRENT_USER_ORDER_BY_UUID)
     public ResponseEntity<OrderResponseDTO> getOrderByUuid(
             @AuthenticationPrincipal User user,
-            @PathVariable UUID uuid) {
-        OrderResponseDTO responseDTO = orderService.getOrderByUuid(uuid);
+            @PathVariable UUID orderUuid) {
+        OrderResponseDTO responseDTO = orderService.getOrderByUuid(orderUuid);
 
         return ResponseEntity.ok(responseDTO);
     }
 
     /*
-     * PATCH method
+     * PUT method
      */
 
-    @PatchMapping(API_CURRENT_USER_ORDER_CANCEL_BY_UUID)
+    @PutMapping(API_CURRENT_USER_ORDER_BY_UUID)
     public ResponseEntity<OrderResponseDTO> cancelOrderByUuid(
             @AuthenticationPrincipal User user,
-            @PathVariable UUID uuid) {
-        OrderResponseDTO responseDTO = orderService.cancelOrderByUuid(uuid);
+            @PathVariable UUID orderUuid) {
+        OrderResponseDTO responseDTO = orderService.cancelOrderByUuid(orderUuid);
 
         return ResponseEntity.ok(responseDTO);
     }

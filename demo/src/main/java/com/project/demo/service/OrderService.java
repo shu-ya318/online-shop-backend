@@ -13,6 +13,7 @@ import java.util.UUID;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.project.demo.dto.common.PaginatedResponse;
 import com.project.demo.model.Order;
@@ -21,25 +22,25 @@ import com.project.demo.model.OrderItem;
 import com.project.demo.model.Product;
 import com.project.demo.dto.order.OrderResponseDTO;
 import com.project.demo.enumeration.OrderStatus;
-import com.project.demo.enumeration.PaymentStatus;
 import com.project.demo.exception.EntityNotFoundException;
 import com.project.demo.dto.order.OrderCreateRequestDTO;
 import com.project.demo.repository.OrderRepository;
-import com.project.demo.repository.PaymentRepository;
 import com.project.demo.repository.UserRepository;
+import com.project.demo.repository.PaymentRepository;
 import com.project.demo.mapper.OrderMapper;
 import com.project.demo.mapper.util.PriceCalculationUtils;
 import com.project.demo.model.Payment;
+import com.project.demo.enumeration.PaymentStatus;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
     private final CartService cartService;
     private final ProductService productService;
+    private final PaymentRepository paymentRepository;
     private final OrderMapper orderMapper;
 
     // --------- Order ---------
@@ -62,34 +63,29 @@ public class OrderService {
         order.setRecipientAddress(dto.recipientAddress());
 
         Set<OrderItem> orderItems = createOrderItems(order, dto);
+        
         order.setItems(orderItems);
-
         order.setTotal(PriceCalculationUtils.calculateTotal(orderItems));
 
         Order savedOrder = orderRepository.save(order);
 
         cartService.clearCart(userUuid);
 
-        OrderResponseDTO responseDTO = orderMapper.toOrderResponseDTO(savedOrder);
-
-        return responseDTO;
+        return orderMapper.toOrderResponseDTO(savedOrder);
     }
 
     // Get all orders by user uuid
     public PaginatedResponse<OrderResponseDTO> getOrders(UUID userUuid, Pageable pageable) {
         Page<Order> orderPage = orderRepository.findByUserUuid(userUuid, pageable);
 
-        List<OrderResponseDTO> orderDTO = orderMapper.toOrderResponseDTOs(orderPage.getContent());
+        List<OrderResponseDTO> orderDTOs = orderMapper.toOrderResponseDTOs(orderPage.getContent());
 
-
-        PaginatedResponse<OrderResponseDTO> responseDTO = new PaginatedResponse<>(
-                orderDTO,
+        return new PaginatedResponse<>(
+                orderDTOs,
                 orderPage.getNumber(),
-            orderPage.getSize(),
-            orderPage.getTotalElements(),
-            orderPage.getTotalPages());
-
-        return responseDTO;
+                orderPage.getSize(),
+                orderPage.getTotalElements(),
+                orderPage.getTotalPages());
     }
 
     // Get order by uuid
@@ -97,9 +93,7 @@ public class OrderService {
         Order order = orderRepository.findByUuid(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found with uuid: " + uuid));
 
-        OrderResponseDTO responseDTO = orderMapper.toOrderResponseDTO(order);
-
-        return responseDTO;
+        return orderMapper.toOrderResponseDTO(order);
     }
 
     // Cancel order by uuid
@@ -112,7 +106,9 @@ public class OrderService {
             order.setStatus(OrderStatus.CANCELLED);
 
             List<Payment> payments = paymentRepository.findByOrderUuid(orderUuid);
+
             payments.forEach(payment -> payment.setStatus(PaymentStatus.CANCELLED));
+
             paymentRepository.saveAll(payments);
 
             productService.releaseStockForOrder(order);
@@ -120,9 +116,7 @@ public class OrderService {
             orderRepository.save(order);
         }
 
-        OrderResponseDTO responseDTO = orderMapper.toOrderResponseDTO(order);
-
-        return responseDTO;
+        return orderMapper.toOrderResponseDTO(order);
     }
 
     // Scheduled task to cancel expired orders
@@ -131,6 +125,7 @@ public class OrderService {
     public void cancelExpiredOrders() {
         List<Order> expiredOrders = orderRepository.findByStatusAndExpiredAtLessThan(OrderStatus.PENDING,
                 LocalDateTime.now());
+
         for (Order order : expiredOrders) {
             order.setStatus(OrderStatus.CANCELLED);
 
@@ -138,10 +133,11 @@ public class OrderService {
         }
     }
 
-    // --------- OrderItem ---------
+    // ----- Private Helper Method -----
 
+    // Create order items
     private Set<OrderItem> createOrderItems(Order order, OrderCreateRequestDTO dto) {
-       Set<OrderItem> orderItems = new HashSet<>();
+        Set<OrderItem> orderItems = new HashSet<>();
 
         dto.items().forEach(item -> {
             Product product = productService.recordSale(item.productUuid(), item.quantity());
@@ -155,11 +151,9 @@ public class OrderService {
             orderItem.setUnitPrice(product.getPrice());
             orderItem.setDiscountPercentage(product.getDiscountPercentage());
             orderItem.setImageUrl(product.getImageUrl());
-
             orderItems.add(orderItem);
         });
 
         return orderItems;
     }
-
 }

@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -17,8 +18,10 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
+    @EntityGraph(attributePaths = {"items.product", "payments", "user"})
     Page<Order> findByUserUuid(UUID userUuid, Pageable pageable);
 
+    @EntityGraph(attributePaths = {"items.product", "payments", "user"})
     Optional<Order> findByUuid(UUID uuid);
 
     List<Order> findByStatusAndExpiredAtLessThan(OrderStatus status, LocalDateTime now);

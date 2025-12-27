@@ -36,7 +36,7 @@ import lombok.ToString;
 })
 @Getter
 @Setter
-@ToString
+@ToString(exclude = {"items", "payments"})
 public class Order {
 
     // ===== Primary Key =====
