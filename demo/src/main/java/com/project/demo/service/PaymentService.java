@@ -1,6 +1,7 @@
 package com.project.demo.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -34,7 +35,6 @@ public class PaymentService {
         private final OrderRepository orderRepository;
         private final PaymentRepository paymentRepository;
         private final PaymentMapper paymentMapper;
-        private final OrderService orderService;
 
         // Create payment
         @Transactional
@@ -62,30 +62,26 @@ public class PaymentService {
                 payment.setTransactionId(gatewayResponseDTO.transactionId());
                 payment.setStatus(gatewayResponseDTO.status());
 
-                paymentRepository.save(payment);
-
                 // For cash on delivery, directly update the order status (no external confirmation required)
                 if (payment.getStatus() == PaymentStatus.PAY_ON_DELIVERY) {
                         order.setStatus(OrderStatus.PROCESSING);
                         order.setUpdatedAt(LocalDateTime.now());
-
                         orderRepository.save(order);
                 }
 
-                PaymentResponseDTO responseDTO = paymentMapper.toPaymentResponseDTO(payment);
+                Payment savedPayment = paymentRepository.save(payment);
+                PaymentResponseDTO baseResponse = paymentMapper.toPaymentResponseDTO(savedPayment);
 
-                PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(
-                                responseDTO.uuid(),
-                                responseDTO.transactionId(),
-                                responseDTO.status(),
-                                responseDTO.method(),
-                                responseDTO.amount(),
-                                responseDTO.currency(),
-                                responseDTO.orderUuid(),
+                return new PaymentResponseDTO(
+                                baseResponse.uuid(),
+                                baseResponse.transactionId(),
+                                baseResponse.status(),
+                                baseResponse.method(),
+                                baseResponse.amount(),
+                                baseResponse.currency(),
+                                baseResponse.orderUuid(),
                                 // For external payment platforms
                                 gatewayResponseDTO.redirectUrl());
-
-                return paymentResponseDTO;
         }
 
         // For external payment platforms, usually need to redirect, then confirm the final transaction status
@@ -104,8 +100,6 @@ public class PaymentService {
                 payment.setStatus(gatewayResponseDTO.status());
                 payment.setTransactionId(gatewayResponseDTO.transactionId());
 
-                paymentRepository.save(payment);
-
                 Order order = payment.getOrder();
 
                 if (order == null) {
@@ -121,11 +115,27 @@ public class PaymentService {
                         orderRepository.save(order);
                 } else {
                         // If payment fails or is cancelled, cancel the order
-                        orderService.cancelOrderByUuid(order.getUuid());
+                        order.setStatus(OrderStatus.CANCELLED);
+
+                        orderRepository.save(order);
                 }
 
-                PaymentCaptureResponseDTO responseDTO = new PaymentCaptureResponseDTO(payment.getStatus(), order.getUuid());
+                paymentRepository.save(payment);
 
-                return responseDTO;
+                return new PaymentCaptureResponseDTO(payment.getStatus(), order.getUuid());
+        }
+
+        // Cancel payments for order
+        @Transactional
+        public void cancelPaymentsForOrder(UUID orderUuid) {
+                List<Payment> payments = paymentRepository.findByOrderUuid(orderUuid);
+
+                if (payments.isEmpty()) {
+                        return;
+                }
+
+                payments.forEach(payment -> payment.setStatus(PaymentStatus.CANCELLED));
+
+                paymentRepository.saveAll(payments);
         }
 }
