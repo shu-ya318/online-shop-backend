@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 
+import com.project.demo.service.RedisService;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -25,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class LogoutResultHandler implements LogoutSuccessHandler {
 
     private final JwtUtil jwtUtil;
+    private final RedisService redisService;
 
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
@@ -44,7 +47,7 @@ public class LogoutResultHandler implements LogoutSuccessHandler {
             // Remove refreshToken from Redis
             if (refreshToken != null) {
                 String uuid = jwtUtil.getUuidFromRefreshToken(refreshToken);
-                jwtUtil.revokeRefreshToken(UUID.fromString(uuid));
+                redisService.deleteRefreshTokenJti(uuid);
             }
 
             Cookie deleteCookie = new Cookie("refreshToken", null);

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import com.project.demo.enumeration.AccountStatus;
 import com.project.demo.enumeration.AuthProvider;
 import com.project.demo.enumeration.Role;
+import com.project.demo.enumeration.Modifier;
 import com.project.demo.model.User;
 import com.project.demo.repository.UserRepository;
 import com.project.demo.service.RedisService;
@@ -60,7 +61,7 @@ public class OAuth2AuthSuccessHandler implements AuthenticationSuccessHandler {
             userRepository.save(user);
 
             String oauth2Code = UUID.randomUUID().toString();
-            redisService.saveOAuth2AuthCode(oauth2Code, user.getUuid().toString(), 5, TimeUnit.MINUTES);
+            redisService.saveOauth2AuthCode(oauth2Code, user.getUuid().toString(), 5, TimeUnit.MINUTES);
 
             String redirectUrl = frontendUrl + "?oauth2Code=" + oauth2Code;
             response.sendRedirect(redirectUrl);
@@ -76,7 +77,7 @@ public class OAuth2AuthSuccessHandler implements AuthenticationSuccessHandler {
         user.setUserRoles(Set.of(Role.CUSTOMER));
         user.setAuthProvider(AuthProvider.GOOGLE);
         user.setCreatedAt(LocalDateTime.now());
-        user.setCreatedBy("oauth2");
+        user.setCreatedBy(Modifier.OAUTH2);
 
         return user;
     }
@@ -85,6 +86,6 @@ public class OAuth2AuthSuccessHandler implements AuthenticationSuccessHandler {
         user.setLastLoginAt(LocalDateTime.now());
         user.setLastLoginIp(request.getRemoteAddr());
         user.setUpdatedAt(LocalDateTime.now());
-        user.setUpdatedBy("oauth2");
+        user.setUpdatedBy(Modifier.OAUTH2);
     }
 }
