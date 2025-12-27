@@ -66,6 +66,7 @@ public interface CartMapper {
                 : product.getDiscountPercentage();
 
         CartItemDTO cartItemDTO = new CartItemDTO(
+                cartItem.getUuid(),
                 product.getName(),
                 product.getPrice(),
                 discountPercentage,

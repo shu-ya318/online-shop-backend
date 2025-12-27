@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record CartItemDTO(
+        UUID cartItemUuid,
         String productName,
         BigDecimal price,
         BigDecimal discountPercentage,

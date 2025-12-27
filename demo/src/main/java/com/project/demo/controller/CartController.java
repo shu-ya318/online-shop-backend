@@ -15,8 +15,8 @@ import jakarta.validation.Valid;
 import java.util.UUID;
 
 import com.project.demo.service.CartService;
-import com.project.demo.dto.cart.CartAddItemRequestDTO;
-import com.project.demo.dto.cart.CartUpdateItemRequestDTO;
+import com.project.demo.dto.cart.CartItemAddRequestDTO;
+import com.project.demo.dto.cart.CartItemQtyUpdateRequestDTO;
 import com.project.demo.dto.cart.CartResponseDTO;
 import com.project.demo.model.User;
 
@@ -41,7 +41,7 @@ public class CartController {
     @PostMapping(API_CURRENT_USER_CART_ITEMS)
     public ResponseEntity<CartResponseDTO> addItemToCart(
             @AuthenticationPrincipal User user,
-            @Valid @RequestBody CartAddItemRequestDTO dto) {
+            @Valid @RequestBody CartItemAddRequestDTO dto) {
         CartResponseDTO responseDTO = cartService.addItemToCart(user.getUuid(), dto);
         
         return ResponseEntity.ok(responseDTO);
@@ -61,15 +61,15 @@ public class CartController {
     // --------- CartItem ---------
 
     /*
-     * PUT
+     * PUT method
      */
 
     @PutMapping(API_CURRENT_USER_CART_ITEM_BY_UUID)
-    public ResponseEntity<CartResponseDTO> updateCartItemQuantity(
+    public ResponseEntity<CartResponseDTO> updateCartItemQty(
             @AuthenticationPrincipal User user,
-            @PathVariable UUID productUuid,
-            @Valid @RequestBody CartUpdateItemRequestDTO dto) {
-        CartResponseDTO responseDTO = cartService.updateCartItemQuantity(user.getUuid(), productUuid, dto.quantity());
+            @PathVariable UUID cartItemUuid,
+            @Valid @RequestBody CartItemQtyUpdateRequestDTO dto) {
+        CartResponseDTO responseDTO = cartService.updateCartItemQty(user.getUuid(), cartItemUuid, dto.quantity());
         
         return ResponseEntity.ok(responseDTO);
     }
@@ -81,8 +81,8 @@ public class CartController {
     @DeleteMapping(API_CURRENT_USER_CART_ITEM_BY_UUID)
     public ResponseEntity<CartResponseDTO> removeItemFromCart(
             @AuthenticationPrincipal User user,
-            @PathVariable UUID productUuid) {
-        CartResponseDTO responseDTO = cartService.removeItemFromCart(user.getUuid(), productUuid);
+            @PathVariable UUID cartItemUuid) {
+        CartResponseDTO responseDTO = cartService.removeItemFromCart(user.getUuid(), cartItemUuid);
 
         return ResponseEntity.ok(responseDTO);
     }
