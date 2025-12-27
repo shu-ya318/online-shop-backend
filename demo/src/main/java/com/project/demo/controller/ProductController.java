@@ -37,8 +37,8 @@ public class ProductController {
 
     @GetMapping(API_PRODUCTS)
     public ResponseEntity<PaginatedResponse<ProductResponseDTO>> getProducts(
-            @RequestParam(name = "filter[keyword]", required = false) String keyword,
-            @RequestParam(name = "filter[category]", required = false) Category category,
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "category", required = false) Category category,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "16") int size,
             @RequestParam(name = "sortBy", defaultValue = "updatedAt") String sortBy,
@@ -52,7 +52,7 @@ public class ProductController {
     }
 
     @GetMapping(API_PRODUCT_BY_UUID)
-    public ResponseEntity<ProductResponseDTO> getProductByUuid(@PathVariable UUID uuid) {
+    public ResponseEntity<ProductResponseDTO> getProductByUuid(@PathVariable("productUuid") UUID uuid) {
         ProductResponseDTO responseDTO = productService.getProductByUuid(uuid);
 
         return ResponseEntity.ok(responseDTO);

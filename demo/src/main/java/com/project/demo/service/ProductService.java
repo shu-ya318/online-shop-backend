@@ -3,6 +3,7 @@ package com.project.demo.service;
 import java.util.List;
 import java.util.UUID;
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,35 +41,26 @@ public class ProductService {
 
 		List<ProductResponseDTO> productDTO = productMapper.toResponseDTOs(productPage.getContent());
 
-		PaginatedResponse<ProductResponseDTO> responseDTO = new PaginatedResponse<>(
+		return new PaginatedResponse<>(
 				productDTO,
 				productPage.getNumber(),
 				productPage.getSize(),
 				productPage.getTotalElements(),
 				productPage.getTotalPages());
-
-		return responseDTO;
 	}
 
 	// Get product by uuid
-	public ProductResponseDTO getProductByUuid(UUID uuid) {
-		Product product = productRepository.findByUuid(uuid)
-				.orElseThrow(() -> new EntityNotFoundException("Product not found with uuid: " + uuid));
-
-		ProductResponseDTO responseDTO = productMapper.toProductResponseDTO(product);
-
-		return responseDTO;
-	}
-
-	// Record Sale
-	@Transactional
-	public Product recordSale(UUID productUuid, int quantity) {
+	public ProductResponseDTO getProductByUuid(UUID productUuid) {
 		Product product = productRepository.findByUuid(productUuid)
 				.orElseThrow(() -> new EntityNotFoundException("Product not found with uuid: " + productUuid));
 
-		if (product.getStock() < quantity) {
-			throw new InsufficientStockException("Insufficient stock for product: " + product.getName());
-		}
+		return productMapper.toProductResponseDTO(product);
+	}
+
+	// Record sale
+	@Transactional
+	public Product recordSale(UUID productUuid, int quantity) {
+		Product product = checkAndGetProduct(productUuid, quantity);
 
 		int newStock = product.getStock() - quantity;
 		product.setStock(newStock);
@@ -83,10 +75,23 @@ public class ProductService {
 		return productRepository.save(product);
 	}
 
-	// Release Stock
+	// Check and get product
+	@Transactional(readOnly = true)
+	public Product checkAndGetProduct(UUID productUuid, int requestedQuantity) {
+		Product product = productRepository.findByUuid(productUuid)
+				.orElseThrow(() -> new EntityNotFoundException("Product not found with uuid: " + productUuid));
+
+		if (product.getStock() < requestedQuantity) {
+			throw new InsufficientStockException(product.getName(), product.getStock());
+		}
+
+		return product;
+	}
+
+	// Release stock
 	@Transactional
 	public void releaseStockForOrder(Order order) {
-		for (OrderItem item : order.getItems()) {
+		List<Product> productsToUpdate = order.getItems().stream().map(item -> {
 			Product product = item.getProduct();
 			int quantity = item.getQuantity();
 
@@ -100,7 +105,9 @@ public class ProductService {
 			product.setTotalSold(product.getTotalSold() - quantity);
 			product.setUpdatedAt(LocalDateTime.now());
 			
-			productRepository.save(product);
-		}
+			return product;
+		}).collect(Collectors.toList());
+		
+		productRepository.saveAll(productsToUpdate);
 	}
 }
