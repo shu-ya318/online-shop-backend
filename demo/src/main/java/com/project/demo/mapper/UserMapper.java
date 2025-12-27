@@ -12,9 +12,8 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
+	// Request
 	User toUser(UserRegisterRequestDTO dto);
-
-	UserLoginResponseDTO toUserLoginResponseDTO(String accessToken);
 
 	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 	void updateUserFromUserRegisterRequestDTO(UserRegisterRequestDTO dto, @MappingTarget User user);
@@ -22,8 +21,9 @@ public interface UserMapper {
 	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 	void updateUserFromUserUpdateRequestDTO(UserUpdateRequestDTO dto, @MappingTarget User user);
 
+	// Response
 	@Mapping(source = "phoneNumber", target = "phoneNumber", defaultExpression = "java(\"\")")
 	@Mapping(source = "address", target = "address", defaultExpression = "java(\"\")")
 	@Mapping(source = "birth", target = "birth", defaultExpression = "java(\"1900-01-01\")")
-	UserResponseDTO toResponseDto(User user);
+	UserResponseDTO toUserResponseDTO(User user);
 }

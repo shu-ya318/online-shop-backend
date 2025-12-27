@@ -3,15 +3,21 @@ package com.project.demo.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.project.demo.dto.user.OAuth2CodeRequestDTO;
+import com.project.demo.dto.user.Oauth2CodeRequestDTO;
 import com.project.demo.dto.user.UserLoginRequestDTO;
-import com.project.demo.dto.user.UserLoginResponseDTO;
+
+import com.project.demo.dto.user.TokenResponseDTO;
 import com.project.demo.dto.user.UserPasswordUpdateRequestDTO;
 import com.project.demo.dto.user.UserRegisterRequestDTO;
 import com.project.demo.dto.user.UserResponseDTO;
 import com.project.demo.dto.user.UserUpdateRequestDTO;
 import com.project.demo.service.UserService;
+import com.project.demo.security.JwtUtil;
+import com.project.demo.exception.InvalidTokenException;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -22,9 +28,9 @@ import java.util.Map;
 import static com.project.demo.data.PathConstantData.API_REGISTER;
 import static com.project.demo.data.PathConstantData.API_LOGIN;
 import static com.project.demo.data.PathConstantData.API_CURRENT_USER;
-import static com.project.demo.data.PathConstantData.API_UPDATE_USER;
-import static com.project.demo.data.PathConstantData.API_UPDATE_PASSWORD;
-import static com.project.demo.data.PathConstantData.API_REFRESH_ACCESS_TOKEN;
+import static com.project.demo.data.PathConstantData.API_CURRENT_USER_UPDATE_PROFILE;
+import static com.project.demo.data.PathConstantData.API_CURRENT_USER_UPDATE_PASSWORD;
+import static com.project.demo.data.PathConstantData.API_REFRESH_TOKENS;
 import static com.project.demo.data.PathConstantData.API_OAUTH2_EXCHANGE_CODE;
 
 @RestController
@@ -32,6 +38,9 @@ import static com.project.demo.data.PathConstantData.API_OAUTH2_EXCHANGE_CODE;
 public class UserController {
 
     private final UserService userService;
+    private final JwtUtil jwtUtil;
+
+    // ---------- AUTH ----------
 
     /*
      * POST method
@@ -45,25 +54,40 @@ public class UserController {
     }
 
     @PostMapping(API_LOGIN)
-    public ResponseEntity<UserLoginResponseDTO> login(@Valid @RequestBody UserLoginRequestDTO dto) {
-        UserLoginResponseDTO responseDTO = userService.login(dto);
+    public ResponseEntity<String> login(@Valid @RequestBody UserLoginRequestDTO dto,
+                                                        HttpServletRequest request,
+                                                        HttpServletResponse response) {
+        TokenResponseDTO responseDTO = userService.login(dto, request.getRemoteAddr());
+        setRefreshTokenCookie(response, responseDTO.refreshToken());
 
-        return ResponseEntity.ok(responseDTO);
-    }
-
-    @PostMapping(API_REFRESH_ACCESS_TOKEN)
-    public ResponseEntity<Map<String, String>> refreshAccessToken() {
-        String accessToken = userService.refreshAccessToken();
-
-        return ResponseEntity.ok(Map.of("accessToken", accessToken));
+        return ResponseEntity.ok(responseDTO.accessToken());
     }
 
     @PostMapping(API_OAUTH2_EXCHANGE_CODE)
-    public ResponseEntity<UserLoginResponseDTO> exchangeOAuth2Code(@Valid @RequestBody OAuth2CodeRequestDTO dto) {
-        UserLoginResponseDTO responseDTO = userService.exchangeOAuth2Code(dto.oauth2Code());
+    public ResponseEntity<String> exchangeOauth2Code(@Valid @RequestBody Oauth2CodeRequestDTO dto,
+                                                                     HttpServletResponse response) {
+        TokenResponseDTO responseDTO = userService.exchangeOauth2Code(dto.oauth2Code());
+        setRefreshTokenCookie(response, responseDTO.refreshToken());
 
-        return ResponseEntity.ok(responseDTO);
+        return ResponseEntity.ok(responseDTO.accessToken());
     }
+
+    @PostMapping(API_REFRESH_TOKENS)
+    public ResponseEntity<String> refreshTokens(
+            @CookieValue(name = "refreshToken", required = false) String refreshToken,
+            HttpServletResponse response) {
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new InvalidTokenException("Refresh token not found in cookie!");
+        }
+
+        TokenResponseDTO responseDTO = userService.refreshTokens(refreshToken);
+        
+        setRefreshTokenCookie(response, responseDTO.refreshToken());
+        
+        return ResponseEntity.ok(responseDTO.accessToken());
+    }
+
+    // ---------- CURRENT USER ----------
 
     /*
      * GET method
@@ -71,7 +95,7 @@ public class UserController {
 
     @GetMapping(API_CURRENT_USER)
     public ResponseEntity<UserResponseDTO> getCurrentUser(Principal principal) {
-        UserResponseDTO responseDTO = userService.getUserResponseDTOByEmail(principal.getName());
+        UserResponseDTO responseDTO = userService.getUserByEmail(principal.getName());
 
         return ResponseEntity.ok(responseDTO);
     }
@@ -80,19 +104,32 @@ public class UserController {
      * PUT method
      */
 
-    @PutMapping(API_UPDATE_USER)
-    public ResponseEntity<UserResponseDTO> updateUser(Principal principal,
+    @PutMapping(API_CURRENT_USER_UPDATE_PROFILE)
+    public ResponseEntity<UserResponseDTO> updateUserProfile(Principal principal,
             @Valid @RequestBody UserUpdateRequestDTO dto) {
-        UserResponseDTO responseDTO = userService.updateUser(principal.getName(), dto);
+        UserResponseDTO responseDTO = userService.updateUserProfile(principal.getName(), dto);
 
         return ResponseEntity.ok(responseDTO);
     }
 
-    @PutMapping(API_UPDATE_PASSWORD)
-    public ResponseEntity<Map<String, String>> updatePassword(Principal principal,
+    @PutMapping(API_CURRENT_USER_UPDATE_PASSWORD)
+    public ResponseEntity<Map<String, String>> updateUserPassword(Principal principal,
             @Valid @RequestBody UserPasswordUpdateRequestDTO dto) {
-        userService.updatePassword(principal.getName(), dto);
+        userService.updateUserPassword(principal.getName(), dto);
 
         return ResponseEntity.ok(Map.of("message", "Password updated successfully!"));
+    }
+
+    // ----- Private Helper Method -----
+
+    private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge((int) jwtUtil.getRefreshTokenExpiration() / 1000);
+
+        response.addCookie(refreshTokenCookie);
     }
 }

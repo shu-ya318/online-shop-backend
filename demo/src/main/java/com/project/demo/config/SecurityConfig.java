@@ -58,7 +58,7 @@ public class SecurityConfig {
                         })
                         .csrf(csrf -> csrf.disable())
                         .sessionManagement(session -> session
-                                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                         .oauth2Login(oauth2 -> oauth2
                                         .successHandler(oAuth2AuthSuccessHandler))
                         .logout(logout -> logout.logoutUrl(API_LOGOUT)
