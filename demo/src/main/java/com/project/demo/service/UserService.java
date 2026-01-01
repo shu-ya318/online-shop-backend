@@ -238,9 +238,10 @@ public class UserService {
         }
 
         String encodedPassword = passwordEncoder.encode(dto.newPassword());
-
         user.setPassword(encodedPassword);
 
         userRepository.save(user);
+
+        redisService.deleteRefreshTokenJti(user.getUuid().toString());
     }
 }

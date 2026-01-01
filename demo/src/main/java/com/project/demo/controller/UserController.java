@@ -114,8 +114,11 @@ public class UserController {
 
     @PutMapping(API_CURRENT_USER_UPDATE_PASSWORD)
     public ResponseEntity<Map<String, String>> updateUserPassword(Principal principal,
-            @Valid @RequestBody UserPasswordUpdateRequestDTO dto) {
+            @Valid @RequestBody UserPasswordUpdateRequestDTO dto,
+            HttpServletResponse response) {
         userService.updateUserPassword(principal.getName(), dto);
+
+        clearRefreshTokenCookie(response);
 
         return ResponseEntity.ok(Map.of("message", "Password updated successfully!"));
     }
@@ -131,5 +134,16 @@ public class UserController {
         refreshTokenCookie.setMaxAge((int) jwtUtil.getRefreshTokenExpiration() / 1000);
 
         response.addCookie(refreshTokenCookie);
+    }
+
+    private void clearRefreshTokenCookie(HttpServletResponse response) {
+        Cookie cookie = new Cookie("refreshToken", null);
+
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        
+        response.addCookie(cookie);
     }
 }
