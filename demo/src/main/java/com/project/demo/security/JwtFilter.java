@@ -1,6 +1,7 @@
 package com.project.demo.security;
 
 import com.project.demo.data.PathConstantData;
+import com.project.demo.service.RedisService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+    private final RedisService redisService;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
@@ -66,6 +68,12 @@ public class JwtFilter extends OncePerRequestFilter {
             String authToken = bearerToken.substring(7);
 
             if (jwtUtil.validateAccessToken(authToken)) {
+                String jti = jwtUtil.getJtiFromToken(authToken);
+                if (redisService.isAccessTokenJtiInBlacklist(jti)) {
+                    filterChain.doFilter(request, response);
+                    return;
+                }
+
                 // Use unique email as username
                 String username = jwtUtil.getEmailFromToken(authToken);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);

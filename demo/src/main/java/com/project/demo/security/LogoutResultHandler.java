@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -21,6 +22,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.concurrent.TimeUnit;
+import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
@@ -35,6 +39,10 @@ public class LogoutResultHandler implements LogoutSuccessHandler {
             throws IOException, ServletException {
 
         try {
+            // 
+            String bearerToken = request.getHeader("Authorization");
+            addTokenToBlacklistIfValid(bearerToken);
+
             // Get and remove refreshToken from Cookie
             String refreshToken = null;
 
@@ -66,6 +74,22 @@ public class LogoutResultHandler implements LogoutSuccessHandler {
 
             Map<String, String> body = Map.of("message", "Logout failed due to a server error!");
             new ObjectMapper().writeValue(response.getWriter(), body);
+        }
+    }
+
+    // ----- Private Helper  Method -----
+    private void addTokenToBlacklistIfValid(String bearerToken) {
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            String accessToken = bearerToken.substring(7);
+
+            if (jwtUtil.validateAccessToken(accessToken)) {
+                String jti = jwtUtil.getJtiFromToken(accessToken);
+                long ttl = jwtUtil.getRemainingTtl(accessToken);
+
+                if (ttl > 0) {
+                    redisService.saveAccessTokenJtiToBlacklist(jti, ttl, TimeUnit.MILLISECONDS);
+                }
+            }
         }
     }
 }

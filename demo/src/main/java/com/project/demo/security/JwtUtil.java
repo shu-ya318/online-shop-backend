@@ -112,4 +112,10 @@ public class JwtUtil {
 	public Date getExpirationDateFromToken(String token) {
 		return jwtParser.parseClaimsJws(token).getBody().getExpiration();
 	}
+
+	public long getRemainingTtl(String token) {
+		Date expiration = getExpirationDateFromToken(token);
+		
+		return expiration.getTime() - System.currentTimeMillis();
+	}
 }

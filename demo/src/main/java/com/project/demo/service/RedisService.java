@@ -13,16 +13,16 @@ public class RedisService {
 
   private final StringRedisTemplate redisTemplate;
 
-  // ===== Jwt =====
-  public void saveJwtBlacklistJti(String jti, long duration, TimeUnit unit) {
-    redisTemplate.opsForValue().set("blacklist:jti:" + jti, "true", duration, unit);
+  // ===== Blacklist of Access Token (jti) =====
+  public void saveAccessTokenJtiToBlacklist(String jti, long duration, TimeUnit unit) {
+    redisTemplate.opsForValue().set("blacklist:access_token:" + jti, "true", duration, unit);
   }
 
-  public boolean isJwtBlacklistedJti(String jti) {
-    return Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:jti:" + jti));
+  public boolean isAccessTokenJtiInBlacklist(String jti) {
+    return Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:access_token:" + jti));
   }
 
-  // ===== Refresh Token ===== 
+  // ===== Whitelist of Refresh Token (jti) ===== 
   public void saveRefreshTokenJti(String userId, String jti, long duration, TimeUnit unit) {
     redisTemplate.opsForValue().set("refresh_token_jti:" + userId, jti, duration, unit);
   }
@@ -35,7 +35,7 @@ public class RedisService {
     redisTemplate.delete("refresh_token_jti:" + userId);
   }
 
-  // ===== Oauth2 Auth Code ===== 
+  // ===== Whitelist of Oauth2 Auth Code ===== 
   public void saveOauth2AuthCode(String oauth2Code, String userId, long duration, TimeUnit unit) {
     redisTemplate.opsForValue().set("oauth2authcode:" + oauth2Code, userId, duration, unit);
   }
