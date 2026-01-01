@@ -160,6 +160,8 @@ public class UserService {
         redisService.saveRefreshTokenJti(user.getUuid().toString(), refreshTokenJti, jwtUtil.getRefreshTokenExpiration(),
                 java.util.concurrent.TimeUnit.MILLISECONDS);
 
+        redisService.deleteOauth2AuthCode(oauth2Code);
+
         return new TokenResponseDTO(accessToken, refreshToken);
     }
 
