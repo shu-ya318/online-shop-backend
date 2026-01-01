@@ -85,12 +85,7 @@ public class UserService {
         user.setUserRoles(Set.of(Role.CUSTOMER));
         user.setAuthProvider(AuthProvider.LOCAL);
         
-        try {
-            userRepository.save(user);
-        } catch (Exception e) {
-            log.error("Critical error saving user {}: {}", dto.email(), e.getMessage());
-            throw e; 
-        }
+        userRepository.save(user);
     }
 
     // Login
@@ -128,9 +123,6 @@ public class UserService {
             return new TokenResponseDTO(accessToken, refreshToken);
         } catch (InvalidCredentialsException | UserDeletedException e) {
             log.warn("Login rejection for {}: {}", dto.email(), e.getMessage());
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected login failure for {}: {}", dto.email(), e.getMessage());
             throw e;
         }
     }

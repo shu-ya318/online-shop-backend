@@ -22,12 +22,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
 import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class LogoutResultHandler implements LogoutSuccessHandler {
 
     private final JwtUtil jwtUtil;
@@ -69,6 +71,7 @@ public class LogoutResultHandler implements LogoutSuccessHandler {
             new ObjectMapper().writeValue(response.getWriter(), body);
 
         } catch (Exception e) {
+            log.error("Logout failed", e);
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 

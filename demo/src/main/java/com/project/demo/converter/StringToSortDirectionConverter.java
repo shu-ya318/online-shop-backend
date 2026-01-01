@@ -8,10 +8,6 @@ public class StringToSortDirectionConverter implements Converter<String, Sort.Di
 
     @Override
     public Sort.Direction convert(@NonNull String source) {
-        try {
-            return Sort.Direction.valueOf(source.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
+        return Sort.Direction.valueOf(source.trim().toUpperCase());
     }
 }

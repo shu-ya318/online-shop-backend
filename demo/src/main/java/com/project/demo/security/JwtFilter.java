@@ -4,6 +4,7 @@ import com.project.demo.data.PathConstantData;
 import com.project.demo.service.RedisService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
@@ -85,6 +87,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         } catch (Exception e) {
+            log.error("Cannot set user authentication", e);
             SecurityContextHolder.clearContext();
             // throw e // Allow request to continue, avoid returning 302
         }

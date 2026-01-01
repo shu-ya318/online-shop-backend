@@ -45,34 +45,26 @@ public class JwtUtil {
 	}
 
 	public String generateAccessToken(Long id, UUID uuid, String email, Set<String> roles) {
-		try {
-			return Jwts.builder()
-					.setId(UUID.randomUUID().toString())
-					.setSubject(uuid.toString())
-					.claim("id", id)
-					.claim("email", email)
-					.claim("roles", roles)
-					.setIssuedAt(new Date())
-					.setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
-					.signWith(key, SignatureAlgorithm.HS256)
-					.compact();
-		} catch (Exception e) {
-			throw e;
-		}
+		return Jwts.builder()
+				.setId(UUID.randomUUID().toString())
+				.setSubject(uuid.toString())
+				.claim("id", id)
+				.claim("email", email)
+				.claim("roles", roles)
+				.setIssuedAt(new Date())
+				.setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
+				.signWith(key, SignatureAlgorithm.HS256)
+				.compact();
 	}
 
 	public String generateRefreshToken(UUID uuid) {
-		try {
-			return Jwts.builder()
-					.setId(UUID.randomUUID().toString())
-					.setSubject(uuid.toString())
-					.setIssuedAt(new Date())
-					.setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
-					.signWith(key, SignatureAlgorithm.HS256)
-					.compact();
-		} catch (Exception e) {
-			throw e;
-		}
+		return Jwts.builder()
+				.setId(UUID.randomUUID().toString())
+				.setSubject(uuid.toString())
+				.setIssuedAt(new Date())
+				.setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
+				.signWith(key, SignatureAlgorithm.HS256)
+				.compact();
 	}
 
 	public boolean validateAccessToken(String token) {

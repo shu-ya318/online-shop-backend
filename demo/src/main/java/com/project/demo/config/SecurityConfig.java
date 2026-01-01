@@ -21,6 +21,7 @@ import com.project.demo.security.LogoutResultHandler;
 import com.project.demo.security.JwtFilter;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -42,6 +43,7 @@ import static com.project.demo.data.PathConstantData.API_LOGOUT;
 
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
 
         private final JwtFilter jwtFilter;
@@ -110,6 +112,8 @@ public class SecurityConfig {
         @Bean
         public AuthenticationEntryPoint customAuthenticationEntryPoint() {
                 return (request, response, authException) -> {
+                        log.warn("Authentication failed: {}", authException.getMessage());
+                        
                         response.setContentType("application/json");
                         response.setStatus(HttpStatus.UNAUTHORIZED.value());
 

@@ -11,10 +11,6 @@ public class StringToCategoryConverter implements Converter<String, Category> {
 
     @Override
     public Category convert(@NonNull String source) {
-        try {
-            return Category.valueOf(source.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
+        return Category.valueOf(source.trim().toUpperCase());
     }
 }
