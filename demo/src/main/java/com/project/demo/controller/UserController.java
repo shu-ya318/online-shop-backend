@@ -13,6 +13,7 @@ import com.project.demo.dto.user.UserResponseDTO;
 import com.project.demo.dto.user.UserUpdateRequestDTO;
 import com.project.demo.service.UserService;
 import com.project.demo.security.JwtUtil;
+import com.project.demo.security.CookieUtil;
 import com.project.demo.exception.InvalidTokenException;
 
 import jakarta.servlet.http.Cookie;
@@ -39,6 +40,7 @@ public class UserController {
 
     private final UserService userService;
     private final JwtUtil jwtUtil;
+    private final CookieUtil cookieUtil;
 
     // ---------- AUTH ----------
 
@@ -58,7 +60,7 @@ public class UserController {
                                                         HttpServletRequest request,
                                                         HttpServletResponse response) {
         TokenResponseDTO responseDTO = userService.login(dto, request.getRemoteAddr());
-        setRefreshTokenCookie(response, responseDTO.refreshToken());
+        cookieUtil.addRefreshTokenCookie(response, responseDTO.refreshToken());
 
         return ResponseEntity.ok(responseDTO.accessToken());
     }
@@ -67,7 +69,7 @@ public class UserController {
     public ResponseEntity<String> exchangeOauth2Code(@Valid @RequestBody Oauth2CodeRequestDTO dto,
                                                                      HttpServletResponse response) {
         TokenResponseDTO responseDTO = userService.exchangeOauth2Code(dto.oauth2Code());
-        setRefreshTokenCookie(response, responseDTO.refreshToken());
+        cookieUtil.addRefreshTokenCookie(response, responseDTO.refreshToken());
 
         return ResponseEntity.ok(responseDTO.accessToken());
     }
@@ -82,7 +84,7 @@ public class UserController {
 
         TokenResponseDTO responseDTO = userService.refreshTokens(refreshToken);
         
-        setRefreshTokenCookie(response, responseDTO.refreshToken());
+        cookieUtil.addRefreshTokenCookie(response, responseDTO.refreshToken());
         
         return ResponseEntity.ok(responseDTO.accessToken());
     }
@@ -118,32 +120,8 @@ public class UserController {
             HttpServletResponse response) {
         userService.updateUserPassword(principal.getName(), dto);
 
-        clearRefreshTokenCookie(response);
+        cookieUtil.clearRefreshTokenCookie(response);
 
         return ResponseEntity.ok(Map.of("message", "Password updated successfully!"));
-    }
-
-    // ----- Private Helper Method -----
-
-    private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(true);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge((int) jwtUtil.getRefreshTokenExpiration() / 1000);
-
-        response.addCookie(refreshTokenCookie);
-    }
-
-    private void clearRefreshTokenCookie(HttpServletResponse response) {
-        Cookie cookie = new Cookie("refreshToken", null);
-
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        
-        response.addCookie(cookie);
     }
 }

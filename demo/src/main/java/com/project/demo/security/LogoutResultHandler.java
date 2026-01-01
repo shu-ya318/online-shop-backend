@@ -28,6 +28,7 @@ public class LogoutResultHandler implements LogoutSuccessHandler {
 
     private final JwtUtil jwtUtil;
     private final RedisService redisService;
+    private final CookieUtil cookieUtil;
 
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
@@ -36,6 +37,7 @@ public class LogoutResultHandler implements LogoutSuccessHandler {
         try {
             // Get and remove refreshToken from Cookie
             String refreshToken = null;
+
             if (request.getCookies() != null) {
                 refreshToken = Arrays.stream(request.getCookies())
                         .filter(c -> "refreshToken".equals(c.getName()))
@@ -44,21 +46,17 @@ public class LogoutResultHandler implements LogoutSuccessHandler {
                         .orElse(null);
             }
 
-            // Remove refreshToken from Redis
+            // Delete refreshToken from Redis and cookies
             if (refreshToken != null) {
                 String uuid = jwtUtil.getUuidFromRefreshToken(refreshToken);
                 redisService.deleteRefreshTokenJti(uuid);
             }
 
-            Cookie deleteCookie = new Cookie("refreshToken", null);
-            deleteCookie.setHttpOnly(true);
-            deleteCookie.setSecure(true);
-            deleteCookie.setPath("/");
-            deleteCookie.setMaxAge(0);
-            response.addCookie(deleteCookie);
+            cookieUtil.clearRefreshTokenCookie(response);
 
             response.setStatus(HttpServletResponse.SC_OK);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
             Map<String, String> body = Map.of("message", "Logout successfully!");
             new ObjectMapper().writeValue(response.getWriter(), body);
 
