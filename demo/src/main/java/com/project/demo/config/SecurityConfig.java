@@ -1,6 +1,7 @@
 package com.project.demo.config;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -53,6 +54,9 @@ public class SecurityConfig {
         @Value("${frontend.url}")
         private String frontendUrl;
 
+        @Value("${app.cors.allowed-origins}")
+        private List<String> allowedOrigins;
+
         @Bean
         SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http
@@ -89,9 +93,9 @@ public class SecurityConfig {
         CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration config = new CorsConfiguration();
 
-                config.setAllowedOrigins(List.of(
-                                frontendUrl,
-                                API_DNS));
+                List<String> allAllowedOrigins = new ArrayList<>(allowedOrigins);
+                allAllowedOrigins.add(API_DNS);
+                config.setAllowedOriginPatterns(allAllowedOrigins);
                 config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                 config.setAllowedHeaders(List.of("*"));
                 config.setAllowCredentials(true);
