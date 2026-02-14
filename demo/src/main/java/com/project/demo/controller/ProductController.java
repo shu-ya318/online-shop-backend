@@ -14,6 +14,7 @@ import com.project.demo.dto.common.PaginatedResponse;
 import com.project.demo.dto.product.ProductFilterRequestDTO;
 import com.project.demo.service.ProductService;
 import com.project.demo.enumeration.Category;
+import com.project.demo.enumeration.SortBy;
 import com.project.demo.dto.product.ProductResponseDTO;
 
 import lombok.RequiredArgsConstructor;
@@ -41,10 +42,10 @@ public class ProductController {
             @RequestParam(name = "category", required = false) Category category,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "16") int size,
-            @RequestParam(name = "sortBy", defaultValue = "updatedAt") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "updatedAt") SortBy sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "DESC") Sort.Direction sortDirection) {
         ProductFilterRequestDTO filter = new ProductFilterRequestDTO(keyword, category);
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy.getField()));
 
         PaginatedResponse<ProductResponseDTO> responseDTO = productService.getProducts(filter, pageable);
 

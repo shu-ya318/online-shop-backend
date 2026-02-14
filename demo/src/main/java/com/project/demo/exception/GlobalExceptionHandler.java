@@ -23,6 +23,7 @@ public class GlobalExceptionHandler {
                 message,
                 request.getDescription(false).replace("uri=", "")
         );
+
         return new ResponseEntity<>(errorResponse, status);
     }
 
@@ -30,6 +31,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex, WebRequest request) {
         log.warn("Method argument type mismatch: {}", ex.getMessage());
         String message = String.format("The UUID is invalid: %s", ex.getValue());
+        
         return buildErrorResponse(HttpStatus.NOT_FOUND, message, request);
     }
 
@@ -92,8 +94,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, WebRequest request) {
         log.error("Unexpected error occurred: ", ex);
-        
         String message = "An unexpected error occurred. Please try again later!";
+        
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, message, request);
     }
 }
