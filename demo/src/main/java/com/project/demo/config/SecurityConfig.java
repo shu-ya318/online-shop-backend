@@ -57,6 +57,7 @@ public class SecurityConfig {
         @Value("${app.cors.allowed-origins}")
         private List<String> allowedOrigins;
 
+
         @Bean
         SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http

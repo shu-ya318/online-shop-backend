@@ -12,6 +12,15 @@ public class PathConstantData {
 			"/login/oauth2/**",
 			"/oauth2/**",
 			"/actuator/**",
+			"/v3/api-docs/**",
+			"/v3/api-docs",
+			"/swagger-ui/**",
+			"/swagger-ui.html",
+			"/swagger-resources/**",
+			"/swagger-resources",
+			"/configuration/ui",
+			"/configuration/security",
+			"/webjars/**",
 	};
 
 	/* USERS */
