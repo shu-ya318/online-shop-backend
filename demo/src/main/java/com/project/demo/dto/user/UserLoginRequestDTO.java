@@ -13,6 +13,6 @@ public record UserLoginRequestDTO(
 
 	@NotBlank(message = "Password is required!") 
 	@Size(min = 8, max = 20,  message = "Password must be 8-20 characters long!") 
-	@Schema(description = "User password", example = "password123")
+	@Schema(description = "User password", example = "password12345")
 	String password) {
 }
