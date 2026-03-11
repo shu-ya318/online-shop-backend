@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import com.project.demo.enumeration.PaymentMethod;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
 public record PaymentRequestDTO(
@@ -11,6 +12,7 @@ public record PaymentRequestDTO(
         PaymentMethod method,
         
         // ===== Relation =====
+        @Schema(type = "string", example = "string")
         @NotNull(message = "Order uuid is required!")
         UUID orderUuid) {
 }

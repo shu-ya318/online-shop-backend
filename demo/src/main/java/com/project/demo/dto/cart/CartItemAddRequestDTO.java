@@ -2,6 +2,7 @@ package com.project.demo.dto.cart;
 
 import java.util.UUID;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
@@ -11,6 +12,7 @@ public record CartItemAddRequestDTO(
         Integer quantity,
 
         // ===== Relation =====
+        @Schema(type = "string", example = "3f4a5b6c-7d8e-9f0a-1b2c-3d4e5f6a7b8c")
         @NotNull(message = "Product uuid is required!") 
         UUID productUuid) {
 }
