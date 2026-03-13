@@ -18,6 +18,13 @@ This is a e-commerce backend built with Spring Boot 3.3.0, providing user manage
 
 ![Database Schema](demo/docs/schema.png)
 
+## API Documentation
+
+The interactive API documentation is available via Swagger UI. You can explore and test the endpoints directly from your browser:
+[Swagger UI - Online Shop](https://shuyahsieh.xyz/onlineShop/swagger-ui/index.html)
+
+![Swagger UI](demo/docs/swagger_ui.png)
+
 ## Getting Start
 
 ### Prerequisites
