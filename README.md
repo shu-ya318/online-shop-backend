@@ -7,7 +7,7 @@ This is a e-commerce backend built with Spring Boot 3.3.0, providing user manage
 - **Framework**: Spring Boot 3.3.0
 - **Java**: JDK 17
 - **Database**: Microsoft SQL Server
-- **Cache**: Redis
+- **Session Store**: Redis
 - **Security**: Spring Security + JWT + OAuth2 (Google)
 - **Mapping**: MapStruct 1.5.5.Final
 - **Payment**: PayPal SDK 1.14.0
@@ -203,10 +203,10 @@ online-shop-backend/
 - Role-based access control
 - CORS cross-origin support
 
-### Cache Configuration
+### Redis Configuration
 
-- Redis for session management and caching
-- Supports password protection
+- Used as a **Session Store** for session management
+- Supports password protection for secure access
 
 ### Payment Configuration
 
